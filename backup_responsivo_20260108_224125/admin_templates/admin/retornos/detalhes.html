@@ -1,0 +1,110 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Detalhes do Retorno #{{ retorno.id }}{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('admin.listar_retornos') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-2"></i> Voltar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="admin-card">
+            <div class="admin-card__header">
+                <h3 class="admin-card__title">
+                    <i class="bi bi-file-earmark-check"></i> Informações do Retorno
+                </h3>
+            </div>
+            <div class="admin-card__body">
+                <table class="table">
+                    <tr>
+                        <th style="width: 200px;">ID</th>
+                        <td>{{ retorno.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Data do Retorno</th>
+                        <td>{{ retorno.data_retorno.strftime('%d/%m/%Y %H:%M') if retorno.data_retorno else '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status ECAD</th>
+                        <td>
+                            {% if retorno.status_ecad == 'ACEITO' %}
+                            <span class="badge bg-success fs-6">{{ retorno.status_ecad }}</span>
+                            {% elif retorno.status_ecad == 'RECUSADO' %}
+                            <span class="badge bg-danger fs-6">{{ retorno.status_ecad }}</span>
+                            {% else %}
+                            <span class="badge bg-secondary fs-6">{{ retorno.status_ecad or '-' }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Código ECAD Gerado</th>
+                        <td><code>{{ retorno.cod_ecad_gerado or '-' }}</code></td>
+                    </tr>
+                    <tr>
+                        <th>Código de Erro</th>
+                        <td>{{ retorno.codigo_erro or '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Mensagem de Erro</th>
+                        <td>{{ retorno.mensagem_erro or '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Observações</th>
+                        <td>{{ retorno.observacoes or '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Criado em</th>
+                        <td>{{ retorno.created_at.strftime('%d/%m/%Y %H:%M') if retorno.created_at else '-' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Card Envio Relacionado -->
+        <div class="admin-card">
+            <div class="admin-card__header">
+                <h5 class="admin-card__title">
+                    <i class="bi bi-send"></i> Envio Relacionado
+                </h5>
+            </div>
+            <div class="admin-card__body">
+                {% if retorno.envio_id %}
+                <p class="mb-2">Envio #{{ retorno.envio_id }}</p>
+                <a href="{{ url_for('admin.detalhes_envio', envio_id=retorno.envio_id) }}" 
+                   class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-eye me-1"></i> Ver Envio
+                </a>
+                {% else %}
+                <p class="text-muted">Nenhum envio relacionado</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Card Fonograma Relacionado -->
+        <div class="admin-card">
+            <div class="admin-card__header">
+                <h5 class="admin-card__title">
+                    <i class="bi bi-music-note-beamed"></i> Fonograma
+                </h5>
+            </div>
+            <div class="admin-card__body">
+                {% if retorno.fonograma_id %}
+                <p class="mb-2">Fonograma #{{ retorno.fonograma_id }}</p>
+                <a href="{{ url_for('usuario.detalhes_fonograma', fonograma_id=retorno.fonograma_id) }}" 
+                   class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-eye me-1"></i> Ver Fonograma
+                </a>
+                {% else %}
+                <p class="text-muted">Nenhum fonograma relacionado</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

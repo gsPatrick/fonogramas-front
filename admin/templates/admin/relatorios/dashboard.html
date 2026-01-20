@@ -1,0 +1,177 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Dashboard de Relatórios{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('admin.menu_relatorios') }}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Voltar
+</a>
+<button onclick="window.print()" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-printer"></i> Imprimir
+</button>
+{% endblock %}
+
+{% block content %}
+<!-- Linha 1: Status e Evolução Mensal (cards menores no topo) -->
+<div class="row g-4 mb-4">
+    <!-- Por Status -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white py-2">
+                <h6 class="mb-0"><i class="bi bi-check-circle me-2"></i>Distribuição por Status</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Status</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if dados.por_status %}
+                        {% for item in dados.por_status %}
+                        <tr>
+                            <td>
+                                {% if item.status == 'ACEITO' %}
+                                <span class="badge bg-success"><i class="bi bi-check-lg me-1"></i>Aceito</span>
+                                {% elif item.status == 'ENVIADO' %}
+                                <span class="badge bg-primary"><i class="bi bi-send me-1"></i>Enviado</span>
+                                {% elif item.status == 'RECUSADO' %}
+                                <span class="badge bg-danger"><i class="bi bi-x-lg me-1"></i>Recusado</span>
+                                {% elif item.status == 'PENDENTE' or item.status == 'NAO_ENVIADO' %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>{{ item.status|replace('_', ' ') }}</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ item.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end fw-bold">{{ item.total }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted py-3">
+                                <i class="bi bi-inbox"></i> Sem dados
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evolução Mensal -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white py-2">
+                <h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Evolução Mensal</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mês</th>
+                            <th class="text-end">Novos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if dados.fonogramas_por_mes %}
+                        {% for item in dados.fonogramas_por_mes %}
+                        <tr>
+                            <td>
+                                <i class="bi bi-calendar3 text-muted me-1"></i>
+                                {{ item.mes }}
+                            </td>
+                            <td class="text-end">
+                                <span class="badge bg-info">{{ item.total }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted py-3">
+                                <i class="bi bi-inbox"></i> Sem dados
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Linha 2: Gêneros (card maior abaixo) -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white py-2 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-music-note-list me-2"></i>Top 10 Gêneros</h6>
+                {% if dados.por_genero %}
+                <a href="{{ url_for('admin.relatorio_por_genero') }}" class="btn btn-sm btn-light">
+                    Ver todos <i class="bi bi-arrow-right"></i>
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body p-0">
+                {% if dados.por_genero %}
+                <div class="row g-0">
+                    {% for item in dados.por_genero %}
+                    <div class="col-md-4 col-sm-6">
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                            <span class="text-truncate" style="max-width: 180px;">{{ item.genero }}</span>
+                            <span class="badge bg-success">{{ item.total }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-inbox"></i> Sem dados
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Linha 3: Links rápidos -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-2">
+                <h6 class="mb-0"><i class="bi bi-lightning text-warning me-2"></i>Relatórios Detalhados</h6>
+            </div>
+            <div class="card-body py-3">
+                <div class="row g-2">
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('admin.relatorio_envios_periodo') }}" class="btn btn-outline-primary w-100 py-3">
+                            <i class="bi bi-send d-block mb-1" style="font-size: 1.25rem;"></i>
+                            Envios
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('admin.relatorio_por_genero') }}" class="btn btn-outline-success w-100 py-3">
+                            <i class="bi bi-music-note d-block mb-1" style="font-size: 1.25rem;"></i>
+                            Gêneros
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('admin.relatorio_por_produtor') }}" class="btn btn-outline-info w-100 py-3">
+                            <i class="bi bi-building d-block mb-1" style="font-size: 1.25rem;"></i>
+                            Produtores
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('admin.relatorio_pendentes') }}" class="btn btn-outline-warning w-100 py-3">
+                            <i class="bi bi-hourglass d-block mb-1" style="font-size: 1.25rem;"></i>
+                            Pendentes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

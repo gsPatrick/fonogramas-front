@@ -1,0 +1,113 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Fonogramas por Produtor{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('admin.menu_relatorios') }}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Voltar
+</a>
+<a href="{{ url_for('admin.exportar_relatorio', tipo='produtor') }}" class="btn btn-sm btn-outline-success">
+    <i class="bi bi-file-excel"></i> Exportar Excel
+</a>
+<button onclick="window.print()" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-printer"></i> Imprimir
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Cards de Resumo -->
+    <div class="col-12 mb-4">
+        <div class="row g-3">
+            {% set total = dados|sum(attribute='total') if dados else 0 %}
+            {% set top_produtor = dados[0] if dados else {'produtor': 'N/A', 'total': 0} %}
+            <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0">{{ dados|length if dados else 0 }}</h3>
+                        <small>Produtores Diferentes</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0">{{ total }}</h3>
+                        <small>Total de Fonogramas</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0 text-truncate" style="font-size: 1rem;">{{ top_produtor.produtor|truncate(30) }}</h3>
+                        <small>Maior Produtor ({{ top_produtor.total }} fonogramas)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabela de Produtores -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-building text-primary me-2"></i>Ranking de Produtores</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if dados and dados|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 admin-table-responsive">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th>Produtor</th>
+                                <th style="width: 150px;">Fonogramas</th>
+                                <th style="width: 200px;">Percentual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in dados %}
+                            {% set percentual = (item.total / total * 100) if total > 0 else 0 %}
+                            <tr>
+                                <td data-label="#">
+                                    {% if loop.index == 1 %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-trophy"></i> 1</span>
+                                    {% elif loop.index == 2 %}
+                                    <span class="badge bg-secondary">2</span>
+                                    {% elif loop.index == 3 %}
+                                    <span class="badge bg-danger">3</span>
+                                    {% else %}
+                                    {{ loop.index }}
+                                    {% endif %}
+                                </td>
+                                <td data-label="Produtor">
+                                    <strong>{{ item.produtor }}</strong>
+                                </td>
+                                <td data-label="Fonogramas">
+                                    <span class="badge bg-primary">{{ item.total }}</span>
+                                </td>
+                                <td data-label="Percentual">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="flex-grow-1" style="height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                            <div style="height: 100%; width: {{ percentual }}%; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 4px;"></div>
+                                        </div>
+                                        <span class="text-muted small" style="min-width: 45px;">{{ "%.1f"|format(percentual) }}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-building text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3">Nenhum dado de produtor disponível.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

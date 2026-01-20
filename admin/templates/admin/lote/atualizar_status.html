@@ -1,0 +1,73 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Atualizar Status em Lote{% endblock %}
+
+{% block content %}
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="card mb-4">
+        <div class="card-header">
+            1. Defina o Novo Status
+        </div>
+        <div class="card-body">
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Novo Status ECAD</label>
+                    <select name="novo_status" class="form-select" required>
+                        <option value="">Selecione...</option>
+                        <option value="NAO_ENVIADO">NAO_ENVIADO</option>
+                        <option value="AGUARDANDO_ENVIO">AGUARDANDO_ENVIO</option>
+                        <option value="ENVIADO">ENVIADO</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Motivo / Observação</label>
+                    <input type="text" name="motivo" class="form-control" placeholder="Opcional">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-warning w-100">Aplicar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            2. Selecione os Fonogramas (Últimos 500)
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th width="40"><input type="checkbox" id="selectAll"></th>
+                        <th>ISRC</th>
+                        <th>Título</th>
+                        <th>Status Atual</th>
+                        <th>Data Criação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in fonogramas %}
+                    <tr>
+                        <td><input type="checkbox" name="fonograma_ids" value="{{ f.id }}"></td>
+                        <td>{{ f.isrc }}</td>
+                        <td>{{ f.titulo }}</td>
+                        <td><span class="badge bg-secondary">{{ f.status_ecad }}</span></td>
+                        <td>{{ f.created_at.strftime('%d/%m/%Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.getElementById('selectAll').addEventListener('change', function () {
+        var checkboxes = document.querySelectorAll('input[name="fonograma_ids"]');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    });
+</script>
+{% endblock %}

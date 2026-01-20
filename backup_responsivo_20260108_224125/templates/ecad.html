@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block header_title %}Gerenciamento ECAD{% endblock %}
+
+{% block content %}
+<section class="ecad-section">
+    <div class="ecad-header">
+        <h2>Gerenciamento de Envios ECAD</h2>
+        <div class="ecad-actions">
+            <button class="btn-primary" id="btnNovoEnvio">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path
+                        d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z" />
+                </svg>
+                Novo Envio
+            </button>
+        </div>
+    </div>
+
+    <!-- Cards de Estatísticas ECAD -->
+    <div class="ecad-stats">
+        <div class="stat-card stat-total">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                    <path
+                        d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM3 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+                </svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value" id="statTotal">-</span>
+                <span class="stat-label">Total de Envios</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-enviados">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                    <path
+                        d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11z" />
+                </svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value" id="statEnviados">-</span>
+                <span class="stat-label">Fonogramas Enviados</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-aceitos">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                    <path
+                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                </svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value" id="statAceitos">-</span>
+                <span class="stat-label">Aceitos pelo ECAD</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-recusados">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                    <path
+                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                </svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value" id="statRecusados">-</span>
+                <span class="stat-label">Recusados</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-pendentes">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                </svg>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value" id="statPendentes">-</span>
+                <span class="stat-label">Aguardando Retorno</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs de Navegação -->
+    <div class="ecad-tabs">
+        <button class="tab-btn active" data-tab="envios">Envios</button>
+        <button class="tab-btn" data-tab="selecao">Selecionar Fonogramas</button>
+        <button class="tab-btn" data-tab="retorno">Importar Retorno</button>
+    </div>
+
+    <!-- Tab: Lista de Envios -->
+    <div class="tab-content active" id="tab-envios">
+        <div class="list-section">
+            <table class="data-table" id="enviosTable">
+                <thead>
+                    <tr>
+                        <th>Protocolo</th>
+                        <th>Data</th>
+                        <th>Fonogramas</th>
+                        <th>Status</th>
+                        <th>Aceitos</th>
+                        <th>Recusados</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="enviosTableBody">
+                    <tr>
+                        <td colspan="7" class="loading">Carregando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab: Seleção de Fonogramas -->
+    <div class="tab-content" id="tab-selecao">
+        <div class="selecao-section">
+            <div class="selecao-header">
+                <h3>Selecionar Fonogramas para Envio</h3>
+                <div class="selecao-filters">
+                    <select id="filtroStatusEcad" class="form-control">
+                        <option value="" selected>Todos os Status</option>
+                        <option value="NAO_ENVIADO">Não Enviados</option>
+                        <option value="RECUSADO">Recusados</option>
+                        <option value="AJUSTADO">Ajustados</option>
+                        <option value="ENVIADO">Enviados</option>
+                        <option value="ACEITO">Aceitos</option>
+                    </select>
+                    <button class="btn-secondary" id="btnFiltrarSelecao">Filtrar</button>
+                </div>
+            </div>
+
+            <div class="selecao-info">
+                <span id="countSelecionados">0</span> fonograma(s) selecionado(s)
+                <button class="btn-primary" id="btnGerarArquivo" disabled>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                        <path
+                            d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                    </svg>
+                    Gerar Arquivo ECAD
+                </button>
+            </div>
+
+            <table class="data-table" id="selecaoTable">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAllFonogramas"></th>
+                        <th>ISRC</th>
+                        <th>Título</th>
+                        <th>Produtor</th>
+                        <th>Status ECAD</th>
+                        <th>Tentativas</th>
+                    </tr>
+                </thead>
+                <tbody id="selecaoTableBody">
+                    <tr>
+                        <td colspan="6" class="loading">Carregando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab: Importar Retorno -->
+    <div class="tab-content" id="tab-retorno">
+        <div class="retorno-section">
+            <div class="upload-area" id="uploadArea">
+                <svg width="48" height="48" viewBox="0 0 16 16" fill="currentColor">
+                    <path
+                        d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                    <path
+                        d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                </svg>
+                <h3>Importar Arquivo de Retorno ECAD</h3>
+                <p>Arraste e solte o arquivo aqui ou clique para selecionar</p>
+                <p class="upload-formats">Formatos aceitos: Excel (.xlsx, .xls), CSV, TXT</p>
+                <input type="file" id="retornoFile" accept=".xlsx,.xls,.csv,.txt" hidden>
+                <button class="btn-secondary" id="btnSelecionarRetorno">Selecionar Arquivo</button>
+            </div>
+
+            <div class="retorno-result" id="retornoResult" style="display: none;">
+                <h3>Resultado do Processamento</h3>
+                <div class="result-stats">
+                    <div class="result-stat result-total">
+                        <span class="result-value" id="resultTotal">0</span>
+                        <span class="result-label">Total Processados</span>
+                    </div>
+                    <div class="result-stat result-aceitos">
+                        <span class="result-value" id="resultAceitos">0</span>
+                        <span class="result-label">Aceitos</span>
+                    </div>
+                    <div class="result-stat result-recusados">
+                        <span class="result-value" id="resultRecusados">0</span>
+                        <span class="result-label">Recusados</span>
+                    </div>
+                </div>
+                <button class="btn-primary" id="btnNovoRetorno">Importar Outro Arquivo</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal: Detalhes do Envio -->
+<div class="modal" id="modalDetalhes">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3>Detalhes do Envio</h3>
+            <button class="modal-close" id="closeModalDetalhes">&times;</button>
+        </div>
+        <div class="modal-body" id="modalDetalhesBody">
+            <!-- Conteúdo dinâmico -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='ecad.js') }}"></script>
+{% endblock %}

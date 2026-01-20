@@ -1,0 +1,103 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Distribuição por Gênero{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('admin.menu_relatorios') }}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Voltar
+</a>
+<a href="{{ url_for('admin.exportar_relatorio', tipo='genero') }}" class="btn btn-sm btn-outline-success">
+    <i class="bi bi-file-excel"></i> Exportar Excel
+</a>
+<button onclick="window.print()" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-printer"></i> Imprimir
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Cards de Resumo -->
+    <div class="col-12 mb-4">
+        <div class="row g-3">
+            {% set total = dados|sum(attribute='total') if dados else 0 %}
+            {% set top_genero = dados[0] if dados else {'genero': 'N/A', 'total': 0} %}
+            <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0">{{ dados|length if dados else 0 }}</h3>
+                        <small>Gêneros Diferentes</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0">{{ total }}</h3>
+                        <small>Total de Fonogramas</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0 text-truncate">{{ top_genero.genero }}</h3>
+                        <small>Gênero Mais Popular ({{ top_genero.total }})</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabela de Gêneros -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-music-note-list text-primary me-2"></i>Fonogramas por Gênero</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if dados and dados|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 admin-table-responsive">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th>Gênero</th>
+                                <th style="width: 150px;">Quantidade</th>
+                                <th style="width: 200px;">Percentual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in dados %}
+                            {% set percentual = (item.total / total * 100) if total > 0 else 0 %}
+                            <tr>
+                                <td data-label="#">{{ loop.index }}</td>
+                                <td data-label="Gênero">
+                                    <strong>{{ item.genero }}</strong>
+                                </td>
+                                <td data-label="Quantidade">
+                                    <span class="badge bg-primary">{{ item.total }}</span>
+                                </td>
+                                <td data-label="Percentual">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="flex-grow-1" style="height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                            <div style="height: 100%; width: {{ percentual }}%; background: linear-gradient(90deg, #6366f1, #8b5cf6); border-radius: 4px;"></div>
+                                        </div>
+                                        <span class="text-muted small" style="min-width: 45px;">{{ "%.1f"|format(percentual) }}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-music-note text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3">Nenhum dado de gênero disponível.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

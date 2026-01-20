@@ -1,0 +1,25 @@
+{
+    "name": "Sistema de Fonogramas SBACEM",
+    "version": "1.0.0",
+    "release_date": "2026-01-09",
+    "description": "Sistema web para gerenciamento de fonogramas musicais com integração ECAD",
+    "author": "SBACEM",
+    "python_version": ">=3.8",
+    "features": [
+        "Autenticação de usuários",
+        "Painel administrativo",
+        "Painel de usuário",
+        "API REST documentada",
+        "Importação CSV/Excel",
+        "Exportação Excel formatada",
+        "Integração ECAD",
+        "Edição em lote",
+        "Auditoria de alterações"
+    ],
+    "security": [
+        "CSRF Protection",
+        "Rate Limiting",
+        "Security Headers",
+        "Secure Session Cookies"
+    ]
+}

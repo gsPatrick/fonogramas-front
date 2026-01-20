@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block header_title %}Listagem de Fonogramas{% endblock %}
+
+{% block content %}
+<section class="list-section">
+    <div class="list-header">
+        <h2>Fonogramas Cadastrados</h2>
+        <div class="list-actions">
+            <button class="btn-primary" id="btnNovo">Novo Fonograma</button>
+            <button class="btn-secondary" id="btnEditarLote" disabled>Editar Selecionados</button>
+            <button class="btn-danger" id="btnDeletarLote" disabled>Deletar Selecionados</button>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-section">
+        <div class="filter-group">
+            <input type="text" id="searchInput" placeholder="Buscar por ISRC, Título, Obra ou Produtor..." class="filter-input">
+            <select id="situacaoFilter" class="filter-select">
+                <option value="">Todas as Situações</option>
+                <option value="ATIVO">Ativo</option>
+                <option value="PENDENTE">Pendente</option>
+                <option value="EM_DISPUTA">Em Disputa</option>
+                <option value="INATIVO">Inativo</option>
+            </select>
+            <select id="generoFilter" class="filter-select">
+                <option value="">Todos os Gêneros</option>
+                <option value="Sertanejo">Sertanejo</option>
+                <option value="Pop">Pop</option>
+                <option value="Rock">Rock</option>
+                <option value="MPB">MPB</option>
+                <option value="Funk">Funk</option>
+                <option value="Pagode">Pagode</option>
+                <option value="Forró">Forró</option>
+                <option value="Axé">Axé</option>
+                <option value="Gospel">Gospel</option>
+                <option value="Eletrônica">Eletrônica</option>
+                <option value="Hip-Hop">Hip-Hop</option>
+                <option value="Jazz">Jazz</option>
+                <option value="Blues">Blues</option>
+                <option value="Country">Country</option>
+                <option value="Clássico">Clássico</option>
+                <option value="Reggae">Reggae</option>
+                <option value="Bossa Nova">Bossa Nova</option>
+            </select>
+            <button class="btn-filter" id="btnFiltrar">Filtrar</button>
+            <button class="btn-filter-secondary" id="btnLimparFiltros">Limpar</button>
+        </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="table-container-large">
+        <table id="fonogramasTable">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>ISRC</th>
+                    <th>Título</th>
+                    <th>Título Obra</th>
+                    <th>Gênero</th>
+                    <th>Produtor</th>
+                    <th>Situação</th>
+                    <th>Data Cadastro</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="fonogramasTableBody">
+                <tr>
+                    <td colspan="9" class="loading">Carregando...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginação -->
+    <div class="pagination" id="pagination">
+    </div>
+</section>
+
+<!-- Modal de Edição em Lote -->
+<div id="modalLote" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edição em Lote</h3>
+            <button class="modal-close" id="closeModalLote">×</button>
+        </div>
+        <div class="modal-body">
+            <p>Atualizar <span id="countSelecionados">0</span> fonograma(s) selecionado(s)</p>
+            <div class="form-group">
+                <label>Campo:</label>
+                <select id="campoLote" class="form-control">
+                    <option value="situacao">Situação</option>
+                    <option value="assoc_gestao">Associação de Gestão</option>
+                    <option value="prioridade">Prioridade</option>
+                    <option value="territorio">Território</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Novo Valor:</label>
+                <input type="text" id="valorLote" class="form-control" placeholder="Digite o novo valor">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" id="cancelModalLote">Cancelar</button>
+            <button class="btn-primary" id="saveModalLote">Salvar</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='listar_fonogramas.js') }}"></script>
+{% endblock %}
+
+
+

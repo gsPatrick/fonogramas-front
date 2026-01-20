@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block flash_messages %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Mobile Toggle Button -->
+        <button class="sidebar-toggle d-md-none" type="button" id="sidebarToggle">
+            <i class="bi bi-list fs-4"></i>
+        </button>
+
+        <!-- Sidebar Overlay (Mobile) -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Sidebar Usuário -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse" id="sidebarNav">
+            <div class="position-sticky" style="top: 0;">
+                <!-- Header da Sidebar - Logo Profissional -->
+                <div class="sidebar-header">
+                    <a href="{{ url_for('usuario.dashboard') }}" class="sidebar-brand" style="justify-content: center;">
+                        <img src="{{ url_for('static', filename='logo_sbacem.png') }}" alt="SBACEM"
+                            style="width: 200px; height: auto; object-fit: contain;">
+                    </a>
+                </div>
+
+                <ul class="nav flex-column mt-3">
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'usuario.dashboard' }}"
+                            href="{{ url_for('usuario.dashboard') }}">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if 'fonogramas' in request.endpoint }}"
+                            href="{{ url_for('usuario.listar_fonogramas') }}">
+                            <i class="bi bi-music-note-list"></i>
+                            <span>Meus Fonogramas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if 'upload' in request.endpoint }}"
+                            href="{{ url_for('usuario.upload_arquivo') }}">
+                            <i class="bi bi-arrow-repeat"></i>
+                            <span>Conversor CSV / Excel</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if 'exportar' in request.endpoint }}"
+                            href="{{ url_for('usuario.exportar') }}">
+                            <i class="bi bi-file-earmark-excel"></i>
+                            <span>Exportar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if 'historico' in request.endpoint }}"
+                            href="{{ url_for('usuario.meu_historico') }}">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Histórico</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <hr class="text-white-50 mx-3">
+
+                <ul class="nav flex-column">
+                    {% if current_user.is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link text-warning" href="{{ url_for('admin.dashboard') }}">
+                            <i class="bi bi-shield-lock"></i>
+                            <span>Painel Admin</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Sair</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Conteúdo principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div
+                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2" style="color: var(--sbacem-roxo);">{% block page_title %}Dashboard{% endblock %}</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    {% block page_actions %}{% endblock %}
+                </div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block usuario_content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+<!-- Sidebar Toggle Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebarNav');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', function () {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            });
+
+            if (overlay) {
+                overlay.addEventListener('click', function () {
+                    sidebar.classList.remove('show');
+                    overlay.classList.remove('show');
+                });
+            }
+        }
+    });
+</script>
+{% endblock %}

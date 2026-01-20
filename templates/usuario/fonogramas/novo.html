@@ -1,0 +1,355 @@
+{% extends "usuario/base_usuario.html" %}
+
+{% block page_title %}Novo Fonograma{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <!-- SEÇÃO 1 - IDENTIFICAÇÃO -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-music-note-beamed me-2"></i>1. Identificação do Fonograma
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">ISRC *</label>
+                            <input type="text" class="form-control" name="isrc" required maxlength="12"
+                                placeholder="BRUM71601234" value="{{ dados.isrc if dados }}">
+                            <div class="form-text">Código único de 12 caracteres</div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Título do Fonograma *</label>
+                            <input type="text" class="form-control" name="titulo" required
+                                value="{{ dados.titulo if dados }}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Versão</label>
+                            <select class="form-select" name="versao">
+                                <option value="">Selecione...</option>
+                                <option value="original" {{ 'selected' if dados and dados.versao=='original' }}>Original
+                                </option>
+                                <option value="remix" {{ 'selected' if dados and dados.versao=='remix' }}>Remix</option>
+                                <option value="ao_vivo" {{ 'selected' if dados and dados.versao=='ao_vivo' }}>Ao Vivo
+                                </option>
+                                <option value="instrumental" {{ 'selected' if dados and dados.versao=='instrumental' }}>
+                                    Instrumental</option>
+                                <option value="acoustic" {{ 'selected' if dados and dados.versao=='acoustic' }}>Acoustic
+                                </option>
+                                <option value="radio_edit" {{ 'selected' if dados and dados.versao=='radio_edit' }}>
+                                    Radio Edit</option>
+                                <option value="cover" {{ 'selected' if dados and dados.versao=='cover' }}>Cover</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Duração *</label>
+                            <input type="text" class="form-control" name="duracao" placeholder="03:45" required
+                                value="{{ dados.duracao if dados }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Ano Gravação</label>
+                            <input type="number" class="form-control" name="ano_grav" min="1900" max="2100"
+                                value="{{ dados.ano_grav if dados }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Ano Lançamento *</label>
+                            <input type="number" class="form-control" name="ano_lanc" required min="1900" max="2100"
+                                value="{{ dados.ano_lanc if dados }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Idioma</label>
+                            <select class="form-select" name="idioma">
+                                <option value="">Selecione...</option>
+                                <option value="PT" {{ 'selected' if dados and dados.idioma=='PT' }}>Português</option>
+                                <option value="EN" {{ 'selected' if dados and dados.idioma=='EN' }}>Inglês</option>
+                                <option value="ES" {{ 'selected' if dados and dados.idioma=='ES' }}>Espanhol</option>
+                                <option value="FR" {{ 'selected' if dados and dados.idioma=='FR' }}>Francês</option>
+                                <option value="IT" {{ 'selected' if dados and dados.idioma=='IT' }}>Italiano</option>
+                                <option value="DE" {{ 'selected' if dados and dados.idioma=='DE' }}>Alemão</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Gênero *</label>
+                            <select class="form-select" name="genero" required>
+                                <option value="">Selecione...</option>
+                                <option value="Sertanejo" {{ 'selected' if dados and dados.genero=='Sertanejo' }}>
+                                    Sertanejo</option>
+                                <option value="Pop" {{ 'selected' if dados and dados.genero=='Pop' }}>Pop</option>
+                                <option value="Rock" {{ 'selected' if dados and dados.genero=='Rock' }}>Rock</option>
+                                <option value="MPB" {{ 'selected' if dados and dados.genero=='MPB' }}>MPB</option>
+                                <option value="Funk" {{ 'selected' if dados and dados.genero=='Funk' }}>Funk</option>
+                                <option value="Pagode" {{ 'selected' if dados and dados.genero=='Pagode' }}>Pagode
+                                </option>
+                                <option value="Forró" {{ 'selected' if dados and dados.genero=='Forró' }}>Forró</option>
+                                <option value="Axé" {{ 'selected' if dados and dados.genero=='Axé' }}>Axé</option>
+                                <option value="Gospel" {{ 'selected' if dados and dados.genero=='Gospel' }}>Gospel
+                                </option>
+                                <option value="Eletrônica" {{ 'selected' if dados and dados.genero=='Eletrônica' }}>
+                                    Eletrônica</option>
+                                <option value="Hip-Hop" {{ 'selected' if dados and dados.genero=='Hip-Hop' }}>Hip-Hop
+                                </option>
+                                <option value="Jazz" {{ 'selected' if dados and dados.genero=='Jazz' }}>Jazz</option>
+                                <option value="Blues" {{ 'selected' if dados and dados.genero=='Blues' }}>Blues</option>
+                                <option value="Clássico" {{ 'selected' if dados and dados.genero=='Clássico' }}>Clássico
+                                </option>
+                                <option value="Reggae" {{ 'selected' if dados and dados.genero=='Reggae' }}>Reggae
+                                </option>
+                                <option value="Bossa Nova" {{ 'selected' if dados and dados.genero=='Bossa Nova' }}>
+                                    Bossa Nova</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Código Interno</label>
+                            <input type="text" class="form-control" name="cod_interno" placeholder="Código da sua base"
+                                value="{{ dados.cod_interno if dados }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 2 - OBRA MUSICAL -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: var(--sbacem-roxo-claro); color: white;">
+                    <i class="bi bi-file-music me-2"></i>2. Obra Musical
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Título da Obra *</label>
+                            <input type="text" class="form-control" name="titulo_obra" required
+                                placeholder="Geralmente igual ao título do fonograma"
+                                value="{{ dados.titulo_obra if dados }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Código da Obra</label>
+                            <input type="text" class="form-control" name="cod_obra"
+                                value="{{ dados.cod_obra if dados }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 4 - PRODUTOR -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: #2d5016; color: white;">
+                    <i class="bi bi-person-badge me-2"></i>3. Produtor Fonográfico
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nome do Produtor *</label>
+                            <input type="text" class="form-control" name="prod_nome" required
+                                value="{{ dados.prod_nome if dados }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">CPF/CNPJ *</label>
+                            <input type="text" class="form-control" name="prod_doc" required
+                                placeholder="Somente números" value="{{ dados.prod_doc if dados }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Percentual *</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="prod_perc" required step="0.01" min="0"
+                                    max="100" value="{{ dados.prod_perc if dados else '100' }}">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Nome Fantasia</label>
+                            <input type="text" class="form-control" name="prod_fantasia"
+                                value="{{ dados.prod_fantasia if dados }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Associação</label>
+                            <select class="form-select" name="prod_assoc">
+                                <option value="">Selecione...</option>
+                                <option value="ABRAMUS" {{ 'selected' if dados and dados.prod_assoc=='ABRAMUS' }}>
+                                    ABRAMUS</option>
+                                <option value="UBC" {{ 'selected' if dados and dados.prod_assoc=='UBC' }}>UBC</option>
+                                <option value="AMAR" {{ 'selected' if dados and dados.prod_assoc=='AMAR' }}>AMAR
+                                </option>
+                                <option value="SBACEM" {{ 'selected' if dados and dados.prod_assoc=='SBACEM' }}>SBACEM
+                                </option>
+                                <option value="SICAM" {{ 'selected' if dados and dados.prod_assoc=='SICAM' }}>SICAM
+                                </option>
+                                <option value="SOCINPRO" {{ 'selected' if dados and dados.prod_assoc=='SOCINPRO' }}>
+                                    SOCINPRO</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data Início</label>
+                            <input type="text" class="form-control" name="prod_data_ini" placeholder="dd/mm/yyyy"
+                                value="{{ dados.prod_data_ini if dados }}">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Endereço</label>
+                            <input type="text" class="form-control" name="prod_endereco"
+                                value="{{ dados.prod_endereco if dados }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 5 - LANÇAMENTO -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: #0d6efd; color: white;">
+                    <i class="bi bi-disc me-2"></i>4. Lançamento
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo de Lançamento</label>
+                            <select class="form-select" name="tipo_lanc">
+                                <option value="">Selecione...</option>
+                                <option value="ALBUM" {{ 'selected' if dados and dados.tipo_lanc=='ALBUM' }}>Álbum
+                                </option>
+                                <option value="SINGLE" {{ 'selected' if dados and dados.tipo_lanc=='SINGLE' }}>Single
+                                </option>
+                                <option value="EP" {{ 'selected' if dados and dados.tipo_lanc=='EP' }}>EP</option>
+                                <option value="COMPILACAO" {{ 'selected' if dados and dados.tipo_lanc=='COMPILACAO' }}>
+                                    Compilação</option>
+                                <option value="TRILHA_SONORA" {{ 'selected' if dados and
+                                    dados.tipo_lanc=='TRILHA_SONORA' }}>Trilha Sonora</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Álbum</label>
+                            <input type="text" class="form-control" name="album" value="{{ dados.album if dados }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Faixa</label>
+                            <input type="number" class="form-control" name="faixa" min="1"
+                                value="{{ dados.faixa if dados }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Formato</label>
+                            <select class="form-select" name="formato">
+                                <option value="">Selecione...</option>
+                                <option value="DIGITAL" {{ 'selected' if dados and dados.formato=='DIGITAL' }}>Digital
+                                </option>
+                                <option value="FISICO" {{ 'selected' if dados and dados.formato=='FISICO' }}>Físico
+                                </option>
+                                <option value="AMBOS" {{ 'selected' if dados and dados.formato=='AMBOS' }}>Ambos
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Selo</label>
+                            <input type="text" class="form-control" name="selo" value="{{ dados.selo if dados }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">País</label>
+                            <input type="text" class="form-control" name="pais"
+                                value="{{ dados.pais if dados else 'Brasil' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data de Lançamento</label>
+                            <input type="text" class="form-control" name="data_lanc" placeholder="dd/mm/yyyy"
+                                value="{{ dados.data_lanc if dados }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 6 - ADMINISTRATIVO -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: #6c757d; color: white;">
+                    <i class="bi bi-gear me-2"></i>5. Administrativo
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Situação</label>
+                            <select class="form-select" name="situacao">
+                                <option value="ATIVO" {{ 'selected' if not dados or dados.situacao=='ATIVO' }}>Ativo
+                                </option>
+                                <option value="PENDENTE" {{ 'selected' if dados and dados.situacao=='PENDENTE' }}>
+                                    Pendente</option>
+                                <option value="EM_DISPUTA" {{ 'selected' if dados and dados.situacao=='EM_DISPUTA' }}>Em
+                                    Disputa</option>
+                                <option value="INATIVO" {{ 'selected' if dados and dados.situacao=='INATIVO' }}>Inativo
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Observações Jurídicas</label>
+                            <textarea class="form-control" name="obs_juridicas"
+                                rows="2">{{ dados.obs_juridicas if dados }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 8 - DISTRIBUIÇÃO -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: #dc3545; color: white;">
+                    <i class="bi bi-globe me-2"></i>6. Distribuição
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Território</label>
+                            <select class="form-select" name="territorio">
+                                <option value="">Selecione...</option>
+                                <option value="BRASIL" {{ 'selected' if dados and dados.territorio=='BRASIL' }}>Brasil
+                                </option>
+                                <option value="INTERNACIONAL" {{ 'selected' if dados and
+                                    dados.territorio=='INTERNACIONAL' }}>Internacional</option>
+                                <option value="AMBOS" {{ 'selected' if dados and dados.territorio=='AMBOS' }}>Ambos
+                                </option>
+                                <option value="AMERICA_LATINA" {{ 'selected' if dados and
+                                    dados.territorio=='AMERICA_LATINA' }}>América Latina</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tipos de Execução</label>
+                            <select class="form-select" name="tipos_exec">
+                                <option value="">Selecione...</option>
+                                <option value="TODOS" {{ 'selected' if dados and dados.tipos_exec=='TODOS' }}>Todos
+                                </option>
+                                <option value="RADIO" {{ 'selected' if dados and dados.tipos_exec=='RADIO' }}>Rádio
+                                </option>
+                                <option value="TV" {{ 'selected' if dados and dados.tipos_exec=='TV' }}>TV</option>
+                                <option value="STREAMING" {{ 'selected' if dados and dados.tipos_exec=='STREAMING' }}>
+                                    Streaming</option>
+                                <option value="SHOWS" {{ 'selected' if dados and dados.tipos_exec=='SHOWS' }}>Shows
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Prioridade</label>
+                            <select class="form-select" name="prioridade">
+                                <option value="">Selecione...</option>
+                                <option value="NORMAL" {{ 'selected' if not dados or dados.prioridade=='NORMAL' }}>
+                                    Normal</option>
+                                <option value="ALTA" {{ 'selected' if dados and dados.prioridade=='ALTA' }}>Alta
+                                </option>
+                                <option value="URGENTE" {{ 'selected' if dados and dados.prioridade=='URGENTE' }}>
+                                    Urgente</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AÇÕES -->
+            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-5">
+                <a href="{{ url_for('usuario.listar_fonogramas') }}"
+                    class="btn btn-outline-secondary btn-lg btn-block-mobile">
+                    <i class="bi bi-arrow-left me-2"></i>Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary btn-lg btn-block-mobile">
+                    <i class="bi bi-check-lg me-2"></i>Salvar Fonograma
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

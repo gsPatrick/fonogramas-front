@@ -1,0 +1,101 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Processar Retorno ECAD{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="admin-card">
+            <div class="admin-card__header">
+                <h3 class="admin-card__title">
+                    <i class="bi bi-file-earmark-arrow-down"></i> Upload de Retorno
+                </h3>
+            </div>
+            <div class="admin-card__body">
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <!-- Upload Zone -->
+                    <div class="admin-upload-zone mb-4" id="uploadZone">
+                        <div class="admin-upload-zone__icon">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                        </div>
+                        <div class="admin-upload-zone__title">Arraste o arquivo aqui</div>
+                        <div class="admin-upload-zone__subtitle mb-3">
+                            ou clique para selecionar (.csv, .xlsx, .txt)
+                        </div>
+                        <input type="file" class="form-control" name="arquivo" id="fileInput"
+                            accept=".csv,.xlsx,.xls,.txt" required style="max-width: 400px; margin: 0 auto;">
+                    </div>
+
+                    <!-- Selecionar Envio -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Relacionar com Envio</label>
+                        <select class="form-select form-select-lg" name="envio_id" required>
+                            <option value="">Selecione o envio correspondente...</option>
+                            {% for envio in envios %}
+                            <option value="{{ envio.id }}">
+                                {{ envio.protocolo }} — {{ envio.data_envio.strftime('%d/%m/%Y') }}
+                                ({{ envio.total_fonogramas }} fonogramas)
+                            </option>
+                            {% else %}
+                            <option value="" disabled>Nenhum envio aguardando retorno</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            Apenas envios com status "Aguardando Retorno" são exibidos.
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle me-2"></i> Processar Retorno
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Help Card -->
+        <div class="admin-card" style="border-top: 4px solid var(--cor-info);">
+            <div class="admin-card__body">
+                <h5 class="mb-3"><i class="bi bi-question-circle text-info me-2"></i>Como funciona?</h5>
+                <ol class="mb-0">
+                    <li class="mb-2">O arquivo de retorno é enviado pelo ECAD após processar seu envio</li>
+                    <li class="mb-2">Selecione o arquivo recebido e o envio correspondente</li>
+                    <li class="mb-2">O sistema atualizará automaticamente o status dos fonogramas</li>
+                    <li>Fonogramas aceitos e recusados serão marcados no sistema</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Drag and drop
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+        }
+    });
+
+    uploadZone.addEventListener('click', (e) => {
+        if (e.target !== fileInput) {
+            fileInput.click();
+        }
+    });
+</script>
+{% endblock %}

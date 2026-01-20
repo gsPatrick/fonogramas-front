@@ -1,0 +1,100 @@
+{% extends "usuario/base_usuario.html" %}
+
+{% block page_title %}Resultado da Validação{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body text-center">
+                <h3>{{ resultado.validos|length }}</h3>
+                <div>Prontos para Salvar</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-danger text-white h-100">
+            <div class="card-body text-center">
+                <h3>{{ resultado.com_erro|length }}</h3>
+                <div>Com Erros</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-secondary text-white h-100">
+            <div class="card-body text-center">
+                <h3>{{ resultado.total }}</h3>
+                <div>Total Processado</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% if resultado.erros_gerais %}
+<div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Falha no Processamento!</h4>
+    <ul class="mb-0">
+        {% for erro in resultado.erros_gerais %}
+        <li>{{ erro }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if resultado.com_erro %}
+<div class="card mb-4 border-danger">
+    <div class="card-header bg-danger text-white">
+        Erros Encontrados
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive" style="max-height: 400px">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Linha</th>
+                        <th>ISRC</th>
+                        <th>Erros</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in resultado.com_erro %}
+                    <tr>
+                        <td>{{ item.linha_origem if item.linha_origem else loop.index }}</td>
+                        <td>{{ item.isrc or 'N/A' }}</td>
+                        <td class="text-danger">
+                            <ul class="mb-0 ps-3">
+                                {% for erro in item.erros %}
+                                <li>{{ erro }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="card mb-4">
+    <div class="card-body text-end">
+        <form action="{{ url_for('usuario.salvar_upload') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if resultado.com_erro %}
+            <div class="form-check d-inline-block me-3">
+                <input class="form-check-input" type="checkbox" name="salvar_apenas_validos" id="salvarValidos">
+                <label class="form-check-label" for="salvarValidos">
+                    Salvar apenas os {{ resultado.validos|length }} válidos
+                </label>
+            </div>
+            {% endif %}
+
+            <a href="{{ url_for('usuario.upload_arquivo') }}" class="btn btn-outline-secondary me-2">Cancelar</a>
+            <button type="submit" class="btn btn-success" {{ 'disabled' if not resultado.validos and not
+                resultado.com_erro }}>
+                Confirmar Importação
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

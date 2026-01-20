@@ -1,0 +1,32 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Onda externa (maior e mais grossa) - curva que se expande da esquerda -->
+  <path d="M 5 50 
+           Q 5 5, 25 5
+           Q 45 5, 65 5
+           Q 85 5, 95 5
+           Q 95 25, 95 50" 
+        stroke="#EF234D" 
+        stroke-width="8" 
+        fill="none" 
+        stroke-linecap="round"/>
+  <!-- Onda média -->
+  <path d="M 8 50 
+           Q 8 12, 25 12
+           Q 42 12, 60 12
+           Q 75 12, 92 12
+           Q 92 28, 92 50" 
+        stroke="#EF234D" 
+        stroke-width="6" 
+        fill="none" 
+        stroke-linecap="round"/>
+  <!-- Onda interna (menor e mais fina) -->
+  <path d="M 11 50 
+           Q 11 19, 25 19
+           Q 39 19, 58 19
+           Q 72 19, 89 19
+           Q 89 31, 89 50" 
+        stroke="#EF234D" 
+        stroke-width="4.5" 
+        fill="none" 
+        stroke-linecap="round"/>
+</svg>

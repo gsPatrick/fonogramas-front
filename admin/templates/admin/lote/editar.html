@@ -1,0 +1,111 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Editar em Lote{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-pencil-square me-2"></i> Edição em Massa de Fonogramas
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Selecione o campo a ser alterado e digite o novo valor que será aplicado a todos os fonogramas
+                        selecionados.
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">IDs dos Fonogramas</label>
+                        <textarea name="fonograma_ids" class="form-control" rows="2" required
+                            placeholder="1, 2, 3... (separados por vírgula)"></textarea>
+                        <div class="form-text">Digite os IDs separados por vírgula ou selecione na tabela abaixo.</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Campo a Editar</label>
+                            <select name="campo" class="form-select" required>
+                                <option value="">Selecione...</option>
+                                <option value="genero">Gênero</option>
+                                <option value="versao">Versão</option>
+                                <option value="idioma">Idioma</option>
+                                <option value="prod_assoc">Associação do Produtor</option>
+                                <option value="assoc_gestao">Associação de Gestão</option>
+                                <option value="situacao">Situação</option>
+                                <option value="status_ecad">Status ECAD</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Novo Valor</label>
+                            <input type="text" name="valor" class="form-control" placeholder="Digite o novo valor"
+                                required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-lg me-2"></i>Aplicar Alteração em Lote
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-lightbulb me-2"></i> Dica
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Gênero:</strong> Pop, Rock, MPB, Sertanejo, Forró, Axé, Funk</p>
+                <p class="mb-2"><strong>Versão:</strong> original, remix, ao vivo, acústico</p>
+                <p class="mb-2"><strong>Idioma:</strong> PT, EN, ES, FR</p>
+                <p class="mb-2"><strong>Associações:</strong> ABRAMUS, UBC, SBACEM, AMAR, SICAM</p>
+                <p class="mb-0"><strong>Status ECAD:</strong> NAO_ENVIADO, ENVIADO, ACEITO, RECUSADO</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if fonogramas %}
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="bi bi-list-ul me-2"></i> Últimos 100 Fonogramas (para referência)
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-sm table-hover mb-0">
+                <thead class="sticky-top bg-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>ISRC</th>
+                        <th>Título</th>
+                        <th>Gênero</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in fonogramas %}
+                    <tr>
+                        <td><strong>{{ f.id }}</strong></td>
+                        <td><code>{{ f.isrc }}</code></td>
+                        <td>{{ f.titulo|truncate(30) }}</td>
+                        <td>{{ f.genero or '-' }}</td>
+                        <td>
+                            <span
+                                class="badge bg-{{ 'success' if f.status_ecad == 'ACEITO' else 'warning' if f.status_ecad == 'ENVIADO' else 'danger' if f.status_ecad == 'RECUSADO' else 'secondary' }}">
+                                {{ f.status_ecad or 'NAO_ENVIADO' }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

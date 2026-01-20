@@ -1,0 +1,112 @@
+{% extends "usuario/base_usuario.html" %}
+
+{% block page_title %}{{ fonograma.titulo }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <div class="display-1 text-{{ status_display.cor }} mb-3">
+                    <i class="bi bi-{{ status_display.icone }}"></i>
+                </div>
+                <h4>{{ status_display.texto }}</h4>
+                <p class="text-muted">ISRC: {{ fonograma.isrc }}</p>
+
+                {% if fonograma.status_ecad not in ['ENVIADO', 'ACEITO'] %}
+                <hr>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('usuario.editar_fonograma', fonograma_id=fonograma.id) }}"
+                        class="btn btn-warning">
+                        <i class="bi bi-pencil me-2"></i> Editar
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Histórico</div>
+            <div class="list-group list-group-flush small">
+                <div class="list-group-item">
+                    <span class="text-muted">Criado em:</span><br>
+                    {{ fonograma.created_at.strftime('%d/%m/%Y %H:%M') }}
+                </div>
+                {% if fonograma.data_ultimo_envio %}
+                <div class="list-group-item">
+                    <span class="text-muted">Último envio:</span><br>
+                    {{ fonograma.data_ultimo_envio.strftime('%d/%m/%Y %H:%M') }}
+                </div>
+                {% endif %}
+                <div class="list-group-item">
+                    <a href="{{ url_for('usuario.meu_historico') }}" class="text-decoration-none">Ver histórico
+                        completo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">Dados do Fonograma</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="text-muted small">Título da Obra</label>
+                        <div class="fw-bold">{{ fonograma.titulo_obra or '-' }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="text-muted small">Duração</label>
+                        <div class="fw-bold">{{ fonograma.duracao }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="text-muted small">Ano</label>
+                        <div class="fw-bold">{{ fonograma.ano_lanc }}</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="text-muted small">Gênero</label>
+                        <div class="fw-bold">{{ fonograma.genero }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text-muted small">Versão</label>
+                        <div class="fw-bold">{{ fonograma.versao }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text-muted small">Idioma</label>
+                        <div class="fw-bold">{{ fonograma.idioma }}</div>
+                    </div>
+
+                    <div class="col-12">
+                        <hr>
+                        <h6>Produtor Fonográfico</h6>
+                        <div class="d-flex justify-content-between">
+                            <span>{{ fonograma.prod_nome }}</span>
+                            <span>{{ fonograma.prod_perc }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Participantes</div>
+            <div class="card-body">
+                <h6 class="text-muted mb-3">Autores</h6>
+                {% if fonograma.autores %}
+                <ul class="list-group mb-4">
+                    {% for autor in fonograma.autores_lista %} <!-- Assume propriedade ou converter string -->
+                    <li class="list-group-item">{{ autor }}</li>
+                    {% else %}
+                    <li class="list-group-item text-muted">{{ fonograma.autores }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <h6 class="text-muted mb-3">Intérpretes</h6>
+                <p class="mb-0">{{ fonograma.interpretes }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

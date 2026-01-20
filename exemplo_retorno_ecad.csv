@@ -1,0 +1,5 @@
+ISRC,STATUS,CODIGO_ERRO,MENSAGEM,COD_ECAD
+BRUM71601234,ACEITO,,Fonograma cadastrado com sucesso,ECAD123456
+BRTEST000003,ACEITO,,Fonograma cadastrado com sucesso,ECAD123457
+BRTEST000004,RECUSADO,E003,Percentuais de autores não somam 100%,
+BRTEST000005,ACEITO,,Fonograma cadastrado com sucesso,ECAD123458

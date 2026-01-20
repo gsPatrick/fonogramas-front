@@ -1,0 +1,42 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Operações em Lote{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-file-earmark-spreadsheet display-4 text-primary mb-3"></i>
+                <h5 class="card-title">Importar Fonogramas</h5>
+                <p class="card-text text-muted">Importe novos fonogramas em massa através de planilhas Excel ou CSV.</p>
+                <a href="{{ url_for('admin.importar_lote') }}" class="btn btn-primary stretched-link">Iniciar
+                    Importação</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-list-check display-4 text-warning mb-3"></i>
+                <h5 class="card-title">Atualizar Status</h5>
+                <p class="card-text text-muted">Atualize o status ECAD de múltiplos fonogramas de uma vez.</p>
+                <a href="{{ url_for('admin.atualizar_status_lote') }}"
+                    class="btn btn-outline-primary stretched-link">Atualizar</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-danger">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-trash display-4 text-danger mb-3"></i>
+                <h5 class="card-title text-danger">Exclusão em Massa</h5>
+                <p class="card-text text-muted">Remova fonogramas incorretos ou duplicados em lote.</p>
+                <a href="{{ url_for('admin.excluir_lote') }}" class="btn btn-outline-danger stretched-link">Excluir</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

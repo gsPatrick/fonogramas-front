@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block header_title %}{% if fonograma_id %}Editar{% else %}Novo{% endif %} Fonograma{% endblock %}
+
+{% block content %}
+<section class="edit-section">
+    <div class="edit-header">
+        <h2>{% if fonograma_id %}Editar{% else %}Novo{% endif %} Fonograma</h2>
+        <div class="edit-actions">
+            <button class="btn-secondary" onclick="window.location.href='/fonogramas'">Cancelar</button>
+            <button class="btn-primary" id="btnSalvar">Salvar</button>
+        </div>
+    </div>
+
+    <form id="fonogramaForm">
+        <!-- SEÇÃO 1 - IDENTIFICAÇÃO -->
+        <div class="form-section">
+            <h3 class="section-title section-identificacao">1. Identificação</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="isrc">ISRC *</label>
+                    <input type="text" id="isrc" name="isrc" class="form-control" required maxlength="12">
+                </div>
+                <div class="form-group">
+                    <label for="titulo">Título *</label>
+                    <input type="text" id="titulo" name="titulo" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="versao">Versão</label>
+                    <select id="versao" name="versao" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="original">Original</option>
+                        <option value="remix">Remix</option>
+                        <option value="ao_vivo">Ao Vivo</option>
+                        <option value="instrumental">Instrumental</option>
+                        <option value="edit">Edit</option>
+                        <option value="acoustic">Acoustic</option>
+                        <option value="radio_edit">Radio Edit</option>
+                        <option value="acapella">Acapella</option>
+                        <option value="cover">Cover</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="duracao">Duração (mm:ss) *</label>
+                    <input type="text" id="duracao" name="duracao" class="form-control" required placeholder="03:45">
+                </div>
+                <div class="form-group">
+                    <label for="ano_grav">Ano Gravação</label>
+                    <input type="number" id="ano_grav" name="ano_grav" class="form-control" min="1900" max="2100">
+                </div>
+                <div class="form-group">
+                    <label for="ano_lanc">Ano Lançamento *</label>
+                    <input type="number" id="ano_lanc" name="ano_lanc" class="form-control" required min="1900" max="2100">
+                </div>
+                <div class="form-group">
+                    <label for="idioma">Idioma</label>
+                    <select id="idioma" name="idioma" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="PT">PT</option>
+                        <option value="EN">EN</option>
+                        <option value="ES">ES</option>
+                        <option value="FR">FR</option>
+                        <option value="IT">IT</option>
+                        <option value="DE">DE</option>
+                        <option value="JP">JP</option>
+                        <option value="KR">KR</option>
+                        <option value="RU">RU</option>
+                        <option value="AR">AR</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="genero">Gênero *</label>
+                    <select id="genero" name="genero" class="form-control" required>
+                        <option value="">Selecione...</option>
+                        <option value="Sertanejo">Sertanejo</option>
+                        <option value="Pop">Pop</option>
+                        <option value="Rock">Rock</option>
+                        <option value="MPB">MPB</option>
+                        <option value="Funk">Funk</option>
+                        <option value="Pagode">Pagode</option>
+                        <option value="Forró">Forró</option>
+                        <option value="Axé">Axé</option>
+                        <option value="Gospel">Gospel</option>
+                        <option value="Eletrônica">Eletrônica</option>
+                        <option value="Hip-Hop">Hip-Hop</option>
+                        <option value="Jazz">Jazz</option>
+                        <option value="Blues">Blues</option>
+                        <option value="Country">Country</option>
+                        <option value="Clássico">Clássico</option>
+                        <option value="Reggae">Reggae</option>
+                        <option value="Bossa Nova">Bossa Nova</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cod_interno">Código Interno</label>
+                    <input type="text" id="cod_interno" name="cod_interno" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <!-- SEÇÃO 2 - OBRA MUSICAL -->
+        <div class="form-section">
+            <h3 class="section-title section-obra">2. Obra Musical</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="titulo_obra">Título da Obra *</label>
+                    <input type="text" id="titulo_obra" name="titulo_obra" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="cod_obra">Código da Obra</label>
+                    <input type="text" id="cod_obra" name="cod_obra" class="form-control">
+                </div>
+            </div>
+            
+            <!-- Autores -->
+            <div class="form-group">
+                <label>Autores *</label>
+                <div id="autoresContainer"></div>
+                <button type="button" class="btn-add" onclick="adicionarAutor()">+ Adicionar Autor</button>
+            </div>
+            
+            <!-- Editoras -->
+            <div class="form-group">
+                <label>Editoras</label>
+                <div id="editorasContainer"></div>
+                <button type="button" class="btn-add" onclick="adicionarEditora()">+ Adicionar Editora</button>
+            </div>
+        </div>
+
+        <!-- SEÇÃO 3 - TITULARES CONEXOS -->
+        <div class="form-section">
+            <h3 class="section-title section-titulares">3. Titulares Conexos</h3>
+            
+            <!-- Intérpretes -->
+            <div class="form-group">
+                <label>Intérpretes *</label>
+                <div id="interpretesContainer"></div>
+                <button type="button" class="btn-add" onclick="adicionarInterprete()">+ Adicionar Intérprete</button>
+            </div>
+            
+            <!-- Músicos -->
+            <div class="form-group">
+                <label>Músicos</label>
+                <div id="musicosContainer"></div>
+                <button type="button" class="btn-add" onclick="adicionarMusico()">+ Adicionar Músico</button>
+            </div>
+        </div>
+
+        <!-- SEÇÃO 4 - PRODUTOR -->
+        <div class="form-section">
+            <h3 class="section-title section-produtor">4. Produtor</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="prod_nome">Nome do Produtor *</label>
+                    <input type="text" id="prod_nome" name="prod_nome" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="prod_doc">CPF/CNPJ do Produtor *</label>
+                    <input type="text" id="prod_doc" name="prod_doc" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="prod_fantasia">Nome Fantasia</label>
+                    <input type="text" id="prod_fantasia" name="prod_fantasia" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="prod_endereco">Endereço</label>
+                    <input type="text" id="prod_endereco" name="prod_endereco" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="prod_perc">Percentual do Produtor *</label>
+                    <input type="number" id="prod_perc" name="prod_perc" class="form-control" required step="0.01" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="prod_assoc">Associação</label>
+                    <select id="prod_assoc" name="prod_assoc" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="ABRAMUS">ABRAMUS</option>
+                        <option value="UBC">UBC</option>
+                        <option value="AMAR">AMAR</option>
+                        <option value="SBACEM">SBACEM</option>
+                        <option value="SICAM">SICAM</option>
+                        <option value="SOCINPRO">SOCINPRO</option>
+                        <option value="ASSIM">ASSIM</option>
+                        <option value="SADEMBRA">SADEMBRA</option>
+                        <option value="ANACIM">ANACIM</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="prod_data_ini">Data Início</label>
+                    <input type="text" id="prod_data_ini" name="prod_data_ini" class="form-control" placeholder="dd/mm/yyyy">
+                </div>
+            </div>
+        </div>
+
+        <!-- SEÇÃO 5 - LANÇAMENTO -->
+        <div class="form-section">
+            <h3 class="section-title section-lancamento">5. Lançamento</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="tipo_lanc">Tipo de Lançamento</label>
+                    <select id="tipo_lanc" name="tipo_lanc" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="ALBUM">Álbum</option>
+                        <option value="SINGLE">Single</option>
+                        <option value="EP">EP</option>
+                        <option value="COMPILACAO">Compilação</option>
+                        <option value="TRILHA_SONORA">Trilha Sonora</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="album">Álbum</label>
+                    <input type="text" id="album" name="album" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="faixa">Faixa</label>
+                    <input type="number" id="faixa" name="faixa" class="form-control" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="selo">Selo</label>
+                    <input type="text" id="selo" name="selo" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="formato">Formato</label>
+                    <select id="formato" name="formato" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="DIGITAL">Digital</option>
+                        <option value="FISICO">Físico</option>
+                        <option value="AMBOS">Ambos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pais">País</label>
+                    <input type="text" id="pais" name="pais" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="data_lanc">Data de Lançamento</label>
+                    <input type="text" id="data_lanc" name="data_lanc" class="form-control" placeholder="dd/mm/yyyy">
+                </div>
+            </div>
+        </div>
+
+        <!-- SEÇÃO 6 - ADMINISTRATIVO -->
+        <div class="form-section">
+            <h3 class="section-title section-administrativo">6. Administrativo</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="assoc_gestao">Associação de Gestão</label>
+                    <select id="assoc_gestao" name="assoc_gestao" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="ABRAMUS">ABRAMUS</option>
+                        <option value="UBC">UBC</option>
+                        <option value="AMAR">AMAR</option>
+                        <option value="SBACEM">SBACEM</option>
+                        <option value="SICAM">SICAM</option>
+                        <option value="SOCINPRO">SOCINPRO</option>
+                        <option value="ASSIM">ASSIM</option>
+                        <option value="SADEMBRA">SADEMBRA</option>
+                        <option value="ANACIM">ANACIM</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="data_cad">Data de Cadastro</label>
+                    <input type="text" id="data_cad" name="data_cad" class="form-control" placeholder="dd/mm/yyyy">
+                </div>
+                <div class="form-group">
+                    <label for="situacao">Situação</label>
+                    <select id="situacao" name="situacao" class="form-control">
+                        <option value="ATIVO">Ativo</option>
+                        <option value="PENDENTE">Pendente</option>
+                        <option value="EM_DISPUTA">Em Disputa</option>
+                        <option value="INATIVO">Inativo</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label for="obs_juridicas">Observações Jurídicas</label>
+                    <textarea id="obs_juridicas" name="obs_juridicas" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label for="historico">Histórico</label>
+                    <textarea id="historico" name="historico" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEÇÃO 7 - DOCUMENTOS -->
+        <div class="form-section">
+            <h3 class="section-title section-documentos">7. Documentos</h3>
+            <div class="form-group">
+                <div id="documentosContainer"></div>
+                <button type="button" class="btn-add" onclick="adicionarDocumento()">+ Adicionar Documento</button>
+            </div>
+        </div>
+
+        <!-- SEÇÃO 8 - DISTRIBUIÇÃO -->
+        <div class="form-section">
+            <h3 class="section-title section-distribuicao">8. Distribuição</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="territorio">Território</label>
+                    <select id="territorio" name="territorio" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="BRASIL">Brasil</option>
+                        <option value="INTERNACIONAL">Internacional</option>
+                        <option value="AMBOS">Ambos</option>
+                        <option value="AMERICA_LATINA">América Latina</option>
+                        <option value="EUROPA">Europa</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tipos_exec">Tipos de Execução</label>
+                    <select id="tipos_exec" name="tipos_exec" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="RADIO">Rádio</option>
+                        <option value="TV">TV</option>
+                        <option value="STREAMING">Streaming</option>
+                        <option value="SHOWS">Shows</option>
+                        <option value="SONORIZACAO">Sonorização</option>
+                        <option value="CINEMA">Cinema</option>
+                        <option value="TODOS">Todos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="prioridade">Prioridade</label>
+                    <select id="prioridade" name="prioridade" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="NORMAL">Normal</option>
+                        <option value="ALTA">Alta</option>
+                        <option value="URGENTE">Urgente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cod_ecad">Código ECAD</label>
+                    <input type="text" id="cod_ecad" name="cod_ecad" class="form-control">
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const fonogramaId = {{ fonograma_id if fonograma_id else 'null' }};
+</script>
+<script src="{{ url_for('static', filename='editar_fonograma.js') }}"></script>
+{% endblock %}
+
+
+

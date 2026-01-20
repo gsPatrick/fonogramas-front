@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Informações do Sistema -->
+<section class="info-section">
+    <div class="info-card">
+        <h3>Sobre o Sistema</h3>
+        <p>Este sistema processa arquivos CSV com dados de fonogramas, realiza validações completas de todos os campos e
+            gera um arquivo Excel formatado no padrão ECAD/ABRAMUS.</p>
+    </div>
+    <div class="info-card">
+        <h3>Funcionalidades</h3>
+        <ul>
+            <li>Validação de CPF, CNPJ e ISRC</li>
+            <li>Verificação de percentuais autorais e conexos</li>
+            <li>Validação de formatos e valores enumerados</li>
+            <li>Geração de Excel formatado com cores por seção</li>
+            <li>Relatório detalhado de erros encontrados</li>
+        </ul>
+    </div>
+    <div class="info-card">
+        <h3>Formato do CSV</h3>
+        <p>O arquivo CSV deve conter colunas separadas por vírgula. Campos compostos (autores, intérpretes, etc.) devem
+            usar pipe (|) para separar valores e ponto-e-vírgula (;) para múltiplos registros.</p>
+        <p class="info-note">Exemplo: "Nome|CPF|Função|%;Nome|CPF|Função|%"</p>
+        <a href="/download-template" class="btn-template">
+            📥 Baixar Template CSV
+        </a>
+    </div>
+</section>
+
+<!-- Área de Upload -->
+<section class="upload-section">
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-content">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <h2>Arraste e solte seu arquivo CSV aqui</h2>
+            <p>ou clique para selecionar</p>
+            <input type="file" id="fileInput" accept=".csv" hidden>
+        </div>
+    </div>
+    <div class="file-info" id="fileInfo" style="display: none;">
+        <span id="fileName"></span>
+        <button class="btn-remove" id="btnRemove" title="Remover arquivo">×</button>
+    </div>
+</section>
+
+<!-- Botão Processar -->
+<section class="actions-section">
+    <button class="btn-primary" id="btnProcessar" disabled>
+        <span class="btn-text">Processar Arquivo</span>
+        <span class="btn-loader" style="display: none;">Processando...</span>
+    </button>
+</section>
+
+<!-- Barra de Progresso -->
+<section class="progress-section" id="progressSection" style="display: none;">
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <p class="progress-text" id="progressText">Processando...</p>
+</section>
+
+<!-- Relatório de Resultados -->
+<section class="results-section" id="resultsSection" style="display: none;">
+    <div class="results-header">
+        <h2>Relatório de Processamento</h2>
+        <p class="results-description">Resultados da validação e processamento do arquivo CSV</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-label">Total de Linhas</div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-value" id="statValidas">0</div>
+            <div class="stat-label">Linhas Válidas</div>
+        </div>
+        <div class="stat-card error">
+            <div class="stat-value" id="statErros">0</div>
+            <div class="stat-label">Linhas com Erro</div>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-value" id="statTotalErros">0</div>
+            <div class="stat-label">Total de Erros</div>
+        </div>
+    </div>
+
+    <!-- Seção de Erros Melhorada -->
+    <div class="errors-section" id="errorsSection" style="display: none;">
+        <div class="errors-header">
+            <h3>Erros Encontrados</h3>
+            <div class="errors-controls">
+                <button class="btn-small" id="btnExpandAll">Expandir Todos</button>
+                <button class="btn-small" id="btnCollapseAll">Recolher Todos</button>
+            </div>
+        </div>
+        <p class="errors-description">Erros agrupados por linha do arquivo CSV</p>
+
+        <!-- Container de erros agrupados -->
+        <div class="errors-grouped" id="errorsGrouped"></div>
+
+        <!-- Mostrar mais -->
+        <div class="errors-more" id="errorsMore" style="display: none;">
+            <button class="btn-secondary" id="btnShowMore">Mostrar mais erros</button>
+            <span id="errorsRemaining"></span>
+        </div>
+    </div>
+
+    <!-- Botão Download -->
+    <div class="download-section">
+        <button class="btn-download" id="btnDownload" style="display: none;">
+            Baixar Excel Gerado
+        </button>
+        <p class="download-note">O arquivo Excel foi gerado com formatação completa e cores por seção conforme padrão
+            ECAD/ABRAMUS</p>
+    </div>
+</section>
+{% endblock %}

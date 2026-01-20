@@ -1,0 +1,182 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Envio: {{ envio.protocolo }}{% endblock %}
+
+{% block page_actions %}
+{% if envio.arquivo_gerado %}
+<a href="{{ url_for('admin.download_arquivo_envio', envio_id=envio.id) }}" class="btn btn-outline-primary">
+    <i class="bi bi-download me-1"></i> Baixar Arquivo
+</a>
+{% endif %}
+<a href="{{ url_for('admin.listar_envios') }}" class="btn btn-outline-secondary ms-2">
+    <i class="bi bi-arrow-left me-1"></i> Voltar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Info do Envio -->
+    <div class="col-lg-4 mb-4">
+        <div class="admin-card h-100">
+            <div class="admin-card__header">
+                <h3 class="admin-card__title">
+                    <i class="bi bi-info-circle"></i> Informações
+                </h3>
+            </div>
+            <div class="admin-card__body admin-card__body--flush">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Protocolo</span>
+                        <strong>{{ envio.protocolo }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Data</span>
+                        <span>{{ envio.data_envio.strftime('%d/%m/%Y %H:%M') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Status</span>
+                        {% if envio.status == 'PROCESSADO' %}
+                        <span class="badge-status badge-status--processado">Processado</span>
+                        {% elif envio.status == 'AGUARDANDO_RETORNO' %}
+                        <span class="badge-status badge-status--aguardando">Aguardando</span>
+                        {% else %}
+                        <span class="badge-status badge-status--pendente">{{ envio.status }}</span>
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Total</span>
+                        <strong>{{ envio.total_fonogramas }} fonogramas</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Tipo</span>
+                        <span>{{ envio.tipo_envio }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Formato</span>
+                        <span>{{ envio.formato_arquivo }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Retornos -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-card h-100">
+            <div class="admin-card__header">
+                <h3 class="admin-card__title">
+                    <i class="bi bi-arrow-return-left"></i> Retornos Processados
+                </h3>
+            </div>
+            <div class="admin-card__body">
+                {% if retornos %}
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Fonograma</th>
+                                <th>Status</th>
+                                <th>Mensagem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ret in retornos %}
+                            <tr>
+                                <td>{{ ret.data_retorno.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    {% if ret.fonograma %}
+                                    <code>{{ ret.fonograma.isrc }}</code>
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if ret.status_ecad == 'ACEITO' %}
+                                    <span class="badge-status badge-status--aceito">Aceito</span>
+                                    {% else %}
+                                    <span class="badge-status badge-status--recusado">Recusado</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ret.mensagem_erro or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state__icon"><i class="bi bi-inbox"></i></div>
+                    <div class="empty-state__title">Nenhum retorno processado</div>
+                    <p class="text-muted">Este envio ainda não recebeu retorno do ECAD.</p>
+                    <a href="{{ url_for('admin.upload_retorno') }}" class="btn btn-primary mt-2">
+                        <i class="bi bi-upload me-1"></i> Processar Retorno
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fonogramas do Envio -->
+<div class="admin-card">
+    <div class="admin-card__header">
+        <h3 class="admin-card__title">
+            <i class="bi bi-music-note-list"></i> Fonogramas neste Envio
+        </h3>
+        <span class="text-muted">{{ envio.fonogramas|length }} itens</span>
+    </div>
+    <div class="admin-card__body admin-card__body--flush">
+        <div class="table-responsive">
+            <table class="admin-table admin-table-responsive">
+                <thead>
+                    <tr>
+                        <th>ISRC</th>
+                        <th>Título</th>
+                        <th>Status Atual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in envio.fonogramas %}
+                    <tr>
+                        <td data-label="ISRC"><code>{{ f.isrc }}</code></td>
+                        <td data-label="Título">{{ f.titulo }}</td>
+                        <td data-label="Status">
+                            {% if f.status_ecad == 'ACEITO' %}
+                            <span class="badge-status badge-status--aceito">Aceito</span>
+                            {% elif f.status_ecad == 'RECUSADO' %}
+                            <span class="badge-status badge-status--recusado">Recusado</span>
+                            {% elif f.status_ecad == 'ENVIADO' %}
+                            <span class="badge-status badge-status--enviado">Enviado</span>
+                            {% else %}
+                            <span class="badge-status badge-status--pendente">{{ f.status_ecad or 'Pendente' }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Ação: Reenviar Recusados -->
+{% set recusados = envio.fonogramas|selectattr('status_ecad', 'equalto', 'RECUSADO')|list %}
+{% if recusados|length > 0 %}
+<div class="admin-card mt-4" style="border-left: 4px solid var(--cor-erro);">
+    <div class="admin-card__body d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h5 class="mb-1"><i class="bi bi-exclamation-triangle text-danger me-2"></i>{{ recusados|length }}
+                fonograma(s) recusado(s)</h5>
+            <p class="text-muted mb-0">Você pode criar um novo envio com os itens recusados.</p>
+        </div>
+        <form method="POST" action="{{ url_for('admin.reenviar_recusados', envio_id=envio.id) }}">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-arrow-repeat me-1"></i> Reenviar Recusados
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

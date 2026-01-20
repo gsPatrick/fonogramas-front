@@ -1,0 +1,346 @@
+{% extends "usuario/base_usuario.html" %}
+
+{% block page_title %}Editar: {{ fonograma.titulo }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <!-- SEÇÃO 1 - IDENTIFICAÇÃO -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <i class="bi bi-music-note-beamed me-2"></i>1. Identificação do Fonograma
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">ISRC</label>
+                            <input type="text" class="form-control bg-light" name="isrc" value="{{ fonograma.isrc }}"
+                                readonly>
+                            <div class="form-text">O ISRC não pode ser alterado</div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Título do Fonograma *</label>
+                            <input type="text" class="form-control" name="titulo" required
+                                value="{{ fonograma.titulo }}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Versão</label>
+                            <select class="form-select" name="versao">
+                                <option value="">Selecione...</option>
+                                <option value="original" {{ 'selected' if fonograma.versao=='original' }}>Original
+                                </option>
+                                <option value="remix" {{ 'selected' if fonograma.versao=='remix' }}>Remix</option>
+                                <option value="ao_vivo" {{ 'selected' if fonograma.versao=='ao_vivo' }}>Ao Vivo</option>
+                                <option value="instrumental" {{ 'selected' if fonograma.versao=='instrumental' }}>
+                                    Instrumental</option>
+                                <option value="acoustic" {{ 'selected' if fonograma.versao=='acoustic' }}>Acoustic
+                                </option>
+                                <option value="radio_edit" {{ 'selected' if fonograma.versao=='radio_edit' }}>Radio Edit
+                                </option>
+                                <option value="cover" {{ 'selected' if fonograma.versao=='cover' }}>Cover</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Duração *</label>
+                            <input type="text" class="form-control" name="duracao" placeholder="03:45" required
+                                value="{{ fonograma.duracao }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Ano Gravação</label>
+                            <input type="number" class="form-control" name="ano_grav" min="1900" max="2100"
+                                value="{{ fonograma.ano_grav }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Ano Lançamento</label>
+                            <input type="number" class="form-control" name="ano_lanc" min="1900" max="2100"
+                                value="{{ fonograma.ano_lanc }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Idioma</label>
+                            <select class="form-select" name="idioma">
+                                <option value="">Selecione...</option>
+                                <option value="PT" {{ 'selected' if fonograma.idioma=='PT' }}>Português</option>
+                                <option value="EN" {{ 'selected' if fonograma.idioma=='EN' }}>Inglês</option>
+                                <option value="ES" {{ 'selected' if fonograma.idioma=='ES' }}>Espanhol</option>
+                                <option value="FR" {{ 'selected' if fonograma.idioma=='FR' }}>Francês</option>
+                                <option value="IT" {{ 'selected' if fonograma.idioma=='IT' }}>Italiano</option>
+                                <option value="DE" {{ 'selected' if fonograma.idioma=='DE' }}>Alemão</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Gênero *</label>
+                            <select class="form-select" name="genero" required>
+                                <option value="">Selecione...</option>
+                                <option value="Sertanejo" {{ 'selected' if fonograma.genero=='Sertanejo' }}>Sertanejo
+                                </option>
+                                <option value="Pop" {{ 'selected' if fonograma.genero=='Pop' }}>Pop</option>
+                                <option value="Rock" {{ 'selected' if fonograma.genero=='Rock' }}>Rock</option>
+                                <option value="MPB" {{ 'selected' if fonograma.genero=='MPB' }}>MPB</option>
+                                <option value="Funk" {{ 'selected' if fonograma.genero=='Funk' }}>Funk</option>
+                                <option value="Pagode" {{ 'selected' if fonograma.genero=='Pagode' }}>Pagode</option>
+                                <option value="Forró" {{ 'selected' if fonograma.genero=='Forró' }}>Forró</option>
+                                <option value="Axé" {{ 'selected' if fonograma.genero=='Axé' }}>Axé</option>
+                                <option value="Gospel" {{ 'selected' if fonograma.genero=='Gospel' }}>Gospel</option>
+                                <option value="Eletrônica" {{ 'selected' if fonograma.genero=='Eletrônica' }}>Eletrônica
+                                </option>
+                                <option value="Hip-Hop" {{ 'selected' if fonograma.genero=='Hip-Hop' }}>Hip-Hop</option>
+                                <option value="Jazz" {{ 'selected' if fonograma.genero=='Jazz' }}>Jazz</option>
+                                <option value="Blues" {{ 'selected' if fonograma.genero=='Blues' }}>Blues</option>
+                                <option value="Clássico" {{ 'selected' if fonograma.genero=='Clássico' }}>Clássico
+                                </option>
+                                <option value="Reggae" {{ 'selected' if fonograma.genero=='Reggae' }}>Reggae</option>
+                                <option value="Bossa Nova" {{ 'selected' if fonograma.genero=='Bossa Nova' }}>Bossa Nova
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Código Interno</label>
+                            <input type="text" class="form-control" name="cod_interno"
+                                value="{{ fonograma.cod_interno }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 2 - OBRA MUSICAL -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: var(--sbacem-roxo-claro); color: white;">
+                    <i class="bi bi-file-music me-2"></i>2. Obra Musical
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Título da Obra *</label>
+                            <input type="text" class="form-control" name="titulo_obra" required
+                                value="{{ fonograma.titulo_obra }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Código da Obra</label>
+                            <input type="text" class="form-control" name="cod_obra" value="{{ fonograma.cod_obra }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 4 - PRODUTOR -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: #2d5016; color: white;">
+                    <i class="bi bi-person-badge me-2"></i>3. Produtor Fonográfico
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nome do Produtor *</label>
+                            <input type="text" class="form-control" name="prod_nome" required
+                                value="{{ fonograma.prod_nome }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">CPF/CNPJ *</label>
+                            <input type="text" class="form-control" name="prod_doc" required
+                                value="{{ fonograma.prod_doc }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Percentual *</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="prod_perc" required step="0.01" min="0"
+                                    max="100" value="{{ fonograma.prod_perc }}">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Nome Fantasia</label>
+                            <input type="text" class="form-control" name="prod_fantasia"
+                                value="{{ fonograma.prod_fantasia }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Associação</label>
+                            <select class="form-select" name="prod_assoc">
+                                <option value="">Selecione...</option>
+                                <option value="ABRAMUS" {{ 'selected' if fonograma.prod_assoc=='ABRAMUS' }}>ABRAMUS
+                                </option>
+                                <option value="UBC" {{ 'selected' if fonograma.prod_assoc=='UBC' }}>UBC</option>
+                                <option value="AMAR" {{ 'selected' if fonograma.prod_assoc=='AMAR' }}>AMAR</option>
+                                <option value="SBACEM" {{ 'selected' if fonograma.prod_assoc=='SBACEM' }}>SBACEM
+                                </option>
+                                <option value="SICAM" {{ 'selected' if fonograma.prod_assoc=='SICAM' }}>SICAM</option>
+                                <option value="SOCINPRO" {{ 'selected' if fonograma.prod_assoc=='SOCINPRO' }}>SOCINPRO
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data Início</label>
+                            <input type="text" class="form-control" name="prod_data_ini" placeholder="dd/mm/yyyy"
+                                value="{{ fonograma.prod_data_ini }}">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Endereço</label>
+                            <input type="text" class="form-control" name="prod_endereco"
+                                value="{{ fonograma.prod_endereco }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 5 - LANÇAMENTO -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: #0d6efd; color: white;">
+                    <i class="bi bi-disc me-2"></i>4. Lançamento
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo de Lançamento</label>
+                            <select class="form-select" name="tipo_lanc">
+                                <option value="">Selecione...</option>
+                                <option value="ALBUM" {{ 'selected' if fonograma.tipo_lanc=='ALBUM' }}>Álbum</option>
+                                <option value="SINGLE" {{ 'selected' if fonograma.tipo_lanc=='SINGLE' }}>Single</option>
+                                <option value="EP" {{ 'selected' if fonograma.tipo_lanc=='EP' }}>EP</option>
+                                <option value="COMPILACAO" {{ 'selected' if fonograma.tipo_lanc=='COMPILACAO' }}>
+                                    Compilação</option>
+                                <option value="TRILHA_SONORA" {{ 'selected' if fonograma.tipo_lanc=='TRILHA_SONORA' }}>
+                                    Trilha Sonora</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Álbum</label>
+                            <input type="text" class="form-control" name="album" value="{{ fonograma.album }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Faixa</label>
+                            <input type="number" class="form-control" name="faixa" min="1"
+                                value="{{ fonograma.faixa }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Formato</label>
+                            <select class="form-select" name="formato">
+                                <option value="">Selecione...</option>
+                                <option value="DIGITAL" {{ 'selected' if fonograma.formato=='DIGITAL' }}>Digital
+                                </option>
+                                <option value="FISICO" {{ 'selected' if fonograma.formato=='FISICO' }}>Físico</option>
+                                <option value="AMBOS" {{ 'selected' if fonograma.formato=='AMBOS' }}>Ambos</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Selo</label>
+                            <input type="text" class="form-control" name="selo" value="{{ fonograma.selo }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">País</label>
+                            <input type="text" class="form-control" name="pais" value="{{ fonograma.pais }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data de Lançamento</label>
+                            <input type="text" class="form-control" name="data_lanc" placeholder="dd/mm/yyyy"
+                                value="{{ fonograma.data_lanc }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 6 - ADMINISTRATIVO -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: #6c757d; color: white;">
+                    <i class="bi bi-gear me-2"></i>5. Administrativo
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Situação</label>
+                            <select class="form-select" name="situacao">
+                                <option value="ATIVO" {{ 'selected' if fonograma.situacao=='ATIVO' }}>Ativo</option>
+                                <option value="PENDENTE" {{ 'selected' if fonograma.situacao=='PENDENTE' }}>Pendente
+                                </option>
+                                <option value="EM_DISPUTA" {{ 'selected' if fonograma.situacao=='EM_DISPUTA' }}>Em
+                                    Disputa</option>
+                                <option value="INATIVO" {{ 'selected' if fonograma.situacao=='INATIVO' }}>Inativo
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Observações Jurídicas</label>
+                            <textarea class="form-control" name="obs_juridicas"
+                                rows="2">{{ fonograma.obs_juridicas }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 8 - DISTRIBUIÇÃO -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: #dc3545; color: white;">
+                    <i class="bi bi-globe me-2"></i>6. Distribuição
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Território</label>
+                            <select class="form-select" name="territorio">
+                                <option value="">Selecione...</option>
+                                <option value="BRASIL" {{ 'selected' if fonograma.territorio=='BRASIL' }}>Brasil
+                                </option>
+                                <option value="INTERNACIONAL" {{ 'selected' if fonograma.territorio=='INTERNACIONAL' }}>
+                                    Internacional</option>
+                                <option value="AMBOS" {{ 'selected' if fonograma.territorio=='AMBOS' }}>Ambos</option>
+                                <option value="AMERICA_LATINA" {{ 'selected' if fonograma.territorio=='AMERICA_LATINA'
+                                    }}>América Latina</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tipos de Execução</label>
+                            <select class="form-select" name="tipos_exec">
+                                <option value="">Selecione...</option>
+                                <option value="TODOS" {{ 'selected' if fonograma.tipos_exec=='TODOS' }}>Todos</option>
+                                <option value="RADIO" {{ 'selected' if fonograma.tipos_exec=='RADIO' }}>Rádio</option>
+                                <option value="TV" {{ 'selected' if fonograma.tipos_exec=='TV' }}>TV</option>
+                                <option value="STREAMING" {{ 'selected' if fonograma.tipos_exec=='STREAMING' }}>
+                                    Streaming</option>
+                                <option value="SHOWS" {{ 'selected' if fonograma.tipos_exec=='SHOWS' }}>Shows</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Prioridade</label>
+                            <select class="form-select" name="prioridade">
+                                <option value="">Selecione...</option>
+                                <option value="NORMAL" {{ 'selected' if fonograma.prioridade=='NORMAL' }}>Normal
+                                </option>
+                                <option value="ALTA" {{ 'selected' if fonograma.prioridade=='ALTA' }}>Alta</option>
+                                <option value="URGENTE" {{ 'selected' if fonograma.prioridade=='URGENTE' }}>Urgente
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INFO STATUS ECAD -->
+            {% if fonograma.status_ecad and fonograma.status_ecad != 'PENDENTE' %}
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Status ECAD:</strong> {{ fonograma.status_ecad }}
+                {% if fonograma.data_ultimo_envio %}
+                — Último envio em {{ fonograma.data_ultimo_envio.strftime('%d/%m/%Y') }}
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- AÇÕES -->
+            <div class="d-flex justify-content-between mb-5">
+                <a href="{{ url_for('usuario.detalhes_fonograma', fonograma_id=fonograma.id) }}"
+                    class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Cancelar
+                </a>
+                <button type="submit" class="btn btn-warning btn-lg">
+                    <i class="bi bi-check-lg me-2"></i>Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

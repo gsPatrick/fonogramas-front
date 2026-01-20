@@ -1,0 +1,98 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Envios por Período{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('admin.menu_relatorios') }}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Voltar
+</a>
+<button onclick="window.print()" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-printer"></i> Imprimir
+</button>
+{% endblock %}
+
+{% block content %}
+<!-- Filtro de Período -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Data Início</label>
+                <input type="date" name="data_inicio" class="form-control" value="{{ request.args.get('data_inicio', '') }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Data Fim</label>
+                <input type="date" name="data_fim" class="form-control" value="{{ request.args.get('data_fim', '') }}">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabela de Envios -->
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-send text-primary me-2"></i>Envios ECAD</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if dados and dados|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 admin-table-responsive">
+                <thead class="table-light">
+                    <tr>
+                        <th>Protocolo</th>
+                        <th>Data Envio</th>
+                        <th>Tipo</th>
+                        <th>Fonogramas</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for envio in dados %}
+                    <tr>
+                        <td data-label="Protocolo">
+                            <strong>{{ envio.protocolo }}</strong>
+                        </td>
+                        <td data-label="Data Envio">{{ envio.data_envio }}</td>
+                        <td data-label="Tipo">
+                            <span class="badge bg-secondary">{{ envio.tipo_envio }}</span>
+                        </td>
+                        <td data-label="Fonogramas">{{ envio.total_fonogramas }}</td>
+                        <td data-label="Status">
+                            {% if envio.status == 'PROCESSADO' %}
+                            <span class="badge bg-success">Processado</span>
+                            {% elif envio.status == 'AGUARDANDO_RETORNO' %}
+                            <span class="badge bg-warning text-dark">Aguardando</span>
+                            {% else %}
+                            <span class="badge bg-info">{{ envio.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Ações">
+                            <a href="{{ url_for('admin.detalhes_envio', envio_id=envio.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-3">Nenhum envio encontrado no período selecionado.</p>
+        </div>
+        {% endif %}
+    </div>
+    {% if dados %}
+    <div class="card-footer bg-white text-muted">
+        <small>Total: {{ dados|length }} envio(s)</small>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

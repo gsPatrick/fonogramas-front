@@ -1,0 +1,64 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Importar Fonogramas{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('admin.operacoes_lote') }}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Voltar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body p-5 text-center">
+                <h4 class="card-title mb-4">Upload de Planilha</h4>
+                <p class="text-muted mb-4">
+                    Selecione um ou mais arquivos CSV ou Excel (.xlsx) contendo os fonogramas.
+                </p>
+
+                <form method="POST" enctype="multipart/form-data" class="mb-4">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-4">
+                        <input type="file" name="arquivo" id="arquivo" class="form-control form-control-lg"
+                            accept=".csv, .xlsx" multiple required>
+                    </div>
+
+                    <div class="row g-3 justify-content-center">
+                        <div class="col-auto">
+                            <button type="submit" name="modo" value="validar"
+                                class="btn btn-outline-primary btn-lg px-4">
+                                <i class="bi bi-search me-2"></i> Apenas Validar
+                            </button>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" name="modo" value="salvar" class="btn btn-success btn-lg px-4">
+                                <i class="bi bi-cloud-upload me-2"></i> Importar e Salvar
+                            </button>
+                        </div>
+                    </div>
+
+                    <p class="text-muted small mt-3">
+                        <strong>Apenas Validar:</strong> Verifica erros sem salvar.<br>
+                        <strong>Importar e Salvar:</strong> Importa diretamente os registros válidos.
+                    </p>
+                </form>
+
+                <hr>
+
+                <div class="text-start mt-4">
+                    <h6>Instruções:</h6>
+                    <ul class="text-muted small">
+                        <li>Certifique-se que o arquivo segue o modelo padrão.</li>
+                        <li>Campos obrigatórios: ISRC, Título, Gênero, Autores.</li>
+                        <li>Use o <a href="{{ url_for('usuario.download_template') }}">modelo de exemplo</a> se tiver
+                            dúvidas.</li>
+                        <li>Registros com ISRC duplicado serão <strong>atualizados</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

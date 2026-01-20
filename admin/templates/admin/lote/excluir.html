@@ -1,0 +1,184 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Excluir em Lote{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Tabela de Fonogramas -->
+    <div class="col-12 mb-4">
+        <div class="admin-card">
+            <div class="admin-card__header">
+                <h5 class="admin-card__title">
+                    <i class="bi bi-list-check"></i> Fonogramas Disponíveis
+                </h5>
+                <span class="badge bg-secondary">{{ fonogramas|length }} registros</span>
+            </div>
+            <div class="admin-card__body admin-card__body--flush">
+                {% if fonogramas %}
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="admin-table" id="tabelaFonogramas">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">
+                                    <input type="checkbox" id="selectAll" title="Selecionar todos">
+                                </th>
+                                <th style="width: 60px;">ID</th>
+                                <th>Título</th>
+                                <th>ISRC</th>
+                                <th>Usuário</th>
+                                <th>Situação</th>
+                                <th>Criado em</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in fonogramas %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="fonograma-check" value="{{ f.id }}"
+                                        data-titulo="{{ f.titulo }}">
+                                </td>
+                                <td><strong>{{ f.id }}</strong></td>
+                                <td>{{ f.titulo or '-' }}</td>
+                                <td><code>{{ f.isrc or '-' }}</code></td>
+                                <td>{{ f.usuario_nome }}</td>
+                                <td>
+                                    <span class="badge badge-{{ f.situacao|lower if f.situacao else 'ativo' }}">
+                                        {{ f.situacao or 'ATIVO' }}
+                                    </span>
+                                </td>
+                                <td>{{ f.created_at.strftime('%d/%m/%Y %H:%M') if f.created_at else '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-inbox empty-state__icon"></i>
+                    <p class="empty-state__title">Nenhum fonograma cadastrado</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário de Exclusão -->
+    <div class="col-md-8 mx-auto">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> Área de Perigo - Exclusão Permanente
+            </div>
+            <div class="card-body">
+                <form method="POST" id="formExcluir">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Esta ação excluirá <strong>permanentemente</strong> os fonogramas selecionados e seus
+                        históricos.
+                        <br><strong>Esta ação não pode ser desfeita.</strong>
+                    </div>
+
+                    <!-- IDs selecionados via checkboxes (hidden) -->
+                    <div id="idsHiddenContainer"></div>
+
+                    <!-- Resumo da seleção -->
+                    <div class="mb-3">
+                        <label class="form-label">Fonogramas Selecionados</label>
+                        <div id="resumoSelecao" class="p-3 bg-light rounded border" style="min-height: 60px;">
+                            <span class="text-muted">Nenhum fonograma selecionado. Use a tabela acima para
+                                selecionar.</span>
+                        </div>
+                    </div>
+
+                    <!-- Opção para digitar IDs manualmente -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <small class="text-muted">Ou digite IDs manualmente (separados por vírgula):</small>
+                        </label>
+                        <textarea name="fonograma_ids_texto" class="form-control" rows="2" placeholder="Ex: 1, 2, 3..."
+                            id="idsTexto"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirmação de Segurança</label>
+                        <input type="text" name="confirmar" class="form-control"
+                            placeholder="Digite CONFIRMAR para habilitar o botão" id="inputConfirmar">
+                        <small class="text-muted">Digite exatamente "CONFIRMAR" para prosseguir.</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger w-100" id="btnExcluir" disabled>
+                        <i class="bi bi-trash"></i> Excluir Permanentemente
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.fonograma-check');
+        const resumoDiv = document.getElementById('resumoSelecao');
+        const idsContainer = document.getElementById('idsHiddenContainer');
+        const inputConfirmar = document.getElementById('inputConfirmar');
+        const btnExcluir = document.getElementById('btnExcluir');
+        const idsTexto = document.getElementById('idsTexto');
+
+        // Selecionar todos
+        if (selectAll) {
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                atualizarResumo();
+            });
+        }
+
+        // Atualizar quando checkbox individual muda
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', atualizarResumo);
+        });
+
+        function atualizarResumo() {
+            const selecionados = Array.from(checkboxes).filter(cb => cb.checked);
+            idsContainer.innerHTML = '';
+
+            if (selecionados.length === 0) {
+                resumoDiv.innerHTML = '<span class="text-muted">Nenhum fonograma selecionado.</span>';
+            } else {
+                const ids = selecionados.map(cb => cb.value);
+                const titulos = selecionados.map(cb => `ID ${cb.value}: ${cb.dataset.titulo || 'Sem título'}`);
+
+                resumoDiv.innerHTML = `
+                <strong class="text-danger">${selecionados.length} fonograma(s) selecionado(s):</strong>
+                <ul class="mb-0 mt-2" style="max-height: 100px; overflow-y: auto;">
+                    ${titulos.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+            `;
+
+                // Adiciona inputs hidden para os IDs selecionados
+                ids.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'fonograma_ids';
+                    input.value = id;
+                    idsContainer.appendChild(input);
+                });
+            }
+
+            verificarBotao();
+        }
+
+        // Habilitar botão quando digitar CONFIRMAR
+        inputConfirmar.addEventListener('input', verificarBotao);
+        idsTexto.addEventListener('input', verificarBotao);
+
+        function verificarBotao() {
+            const selecionados = Array.from(checkboxes).filter(cb => cb.checked);
+            const temIds = selecionados.length > 0 || idsTexto.value.trim().length > 0;
+            const confirmado = inputConfirmar.value === 'CONFIRMAR';
+            btnExcluir.disabled = !(temIds && confirmado);
+        }
+    });
+</script>
+{% endblock %}

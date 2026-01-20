@@ -1,0 +1,61 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Relatório Analítico{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('admin.menu_relatorios') }}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Voltar
+</a>
+<button onclick="window.print()" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-printer"></i> Imprimir
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <!-- Renderização genérica de dados -->
+        {% if dados is mapping %}
+        <div class="row">
+            {% for chave, valor in dados.items() %}
+            <div class="col-md-6 mb-3">
+                <strong>{{ chave }}:</strong> {{ valor }}
+            </div>
+            {% endfor %}
+        </div>
+        {% elif dados is iterable and dados|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <!-- Tenta inferir cabeçalhos do primeiro item se for dict -->
+                        {% if dados[0] is mapping %}
+                        {% for col in dados[0].keys() %}
+                        <th>{{ col|upper }}</th>
+                        {% endfor %}
+                        {% else %}
+                        <th>Valor</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in dados %}
+                    <tr>
+                        {% if item is mapping %}
+                        {% for val in item.values() %}
+                        <td>{{ val }}</td>
+                        {% endfor %}
+                        {% else %}
+                        <td>{{ item }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-muted my-5">Nenhum dado encontrado para o relatório.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

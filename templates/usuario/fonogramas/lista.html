@@ -1,0 +1,375 @@
+{% extends "usuario/base_usuario.html" %}
+
+{% block page_title %}Meus Fonogramas{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('usuario.dashboard') }}" class="btn-sbacem btn-sbacem--secondary btn-sbacem--sm me-2">
+    <i class="bi bi-arrow-left"></i> Voltar
+</a>
+<a href="{{ url_for('usuario.novo_fonograma') }}" class="btn-sbacem btn-sbacem--success btn-sbacem--sm">
+    <i class="bi bi-plus-lg"></i> Novo
+</a>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Fix para modal - garantir que formulários funcionem */
+    .modal {
+        z-index: 1050 !important;
+    }
+
+    .modal-backdrop {
+        z-index: 1040 !important;
+    }
+
+    .modal-dialog {
+        z-index: 1060 !important;
+    }
+
+    .modal .form-select,
+    .modal .form-control {
+        position: relative;
+        z-index: 1070 !important;
+    }
+</style>
+{% endblock %}
+
+{% block usuario_content %}
+<div class="form-section">
+    <!-- Filtros -->
+    <form class="mb-4" method="GET">
+        <!-- Linha principal de busca -->
+        <div class="row g-2 mb-2">
+            <div class="col-md-4">
+                <input type="text" class="form-control form-control-modern" name="busca"
+                    placeholder="Buscar ISRC, Título..." value="{{ filtros.busca or '' }}">
+            </div>
+            <div class="col-md-2">
+                <select class="form-select form-control-modern" name="status">
+                    <option value="">Status</option>
+                    <option value="NAO_ENVIADO" {{ 'selected' if (filtros.status or '' )=='NAO_ENVIADO' }}>Não Enviado
+                    </option>
+                    <option value="ENVIADO" {{ 'selected' if (filtros.status or '' )=='ENVIADO' }}>Enviado</option>
+                    <option value="ACEITO" {{ 'selected' if (filtros.status or '' )=='ACEITO' }}>Aceito</option>
+                    <option value="RECUSADO" {{ 'selected' if (filtros.status or '' )=='RECUSADO' }}>Recusado</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select form-control-modern" name="genero">
+                    <option value="">Gênero</option>
+                    <option value="Sertanejo" {{ 'selected' if (filtros.genero or '' )=='Sertanejo' }}>Sertanejo
+                    </option>
+                    <option value="Pop" {{ 'selected' if (filtros.genero or '' )=='Pop' }}>Pop</option>
+                    <option value="Rock" {{ 'selected' if (filtros.genero or '' )=='Rock' }}>Rock</option>
+                    <option value="MPB" {{ 'selected' if (filtros.genero or '' )=='MPB' }}>MPB</option>
+                    <option value="Forró" {{ 'selected' if (filtros.genero or '' )=='Forró' }}>Forró</option>
+                    <option value="Axé" {{ 'selected' if (filtros.genero or '' )=='Axé' }}>Axé</option>
+                    <option value="Funk" {{ 'selected' if (filtros.genero or '' )=='Funk' }}>Funk</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select form-control-modern" name="prod_assoc">
+                    <option value="">Associação</option>
+                    <option value="ABRAMUS" {{ 'selected' if (filtros.prod_assoc or '' )=='ABRAMUS' }}>ABRAMUS</option>
+                    <option value="UBC" {{ 'selected' if (filtros.prod_assoc or '' )=='UBC' }}>UBC</option>
+                    <option value="SBACEM" {{ 'selected' if (filtros.prod_assoc or '' )=='SBACEM' }}>SBACEM</option>
+                    <option value="AMAR" {{ 'selected' if (filtros.prod_assoc or '' )=='AMAR' }}>AMAR</option>
+                    <option value="SICAM" {{ 'selected' if (filtros.prod_assoc or '' )=='SICAM' }}>SICAM</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn-sbacem btn-sbacem--primary flex-grow-1">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+                <a href="{{ url_for('usuario.listar_fonogramas') }}" class="btn btn-outline-secondary" title="Limpar">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Filtros avançados (período) -->
+        <div class="row g-2">
+            <div class="col-md-2">
+                <input type="date" class="form-control form-control-modern" name="data_inicio"
+                    value="{{ filtros.data_inicio or '' }}" placeholder="Data início">
+            </div>
+            <div class="col-md-2">
+                <input type="date" class="form-control form-control-modern" name="data_fim"
+                    value="{{ filtros.data_fim or '' }}" placeholder="Data fim">
+            </div>
+        </div>
+    </form>
+
+    <!-- Barra de Ações em Massa -->
+    <div id="bulkActions" class="alert alert-warning d-none mb-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span>
+                <strong id="selectedCount">0</strong> fonograma(s) selecionado(s)
+            </span>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="deselectAll()">
+                    <i class="bi bi-x-lg"></i> Limpar
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#modalEditarMassa">
+                    <i class="bi bi-pencil-square"></i> Editar Selecionados
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="excluirSelecionados()">
+                    <i class="bi bi-trash"></i> Excluir Selecionados
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário de Exclusão em Massa -->
+    <form id="formExclusaoMassa" action="{{ url_for('usuario.excluir_fonogramas_massa') }}" method="POST"
+        style="display: none;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="fonograma_ids" id="fonogramaIds">
+    </form>
+
+    <!-- Modal Edição em Massa -->
+    <div class="modal fade" id="modalEditarMassa" tabindex="-1" aria-labelledby="modalEditarMassaLabel"
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalEditarMassaLabel">
+                        <i class="bi bi-pencil-square me-2"></i>Editar em Lote
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Fechar"></button>
+                </div>
+                <form id="formEditarMassa" action="{{ url_for('usuario.editar_fonogramas_massa') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="modal-body">
+                        <input type="hidden" name="fonograma_ids" id="editarFonogramaIds">
+
+                        <p class="text-muted mb-3">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Selecione o campo que deseja alterar e informe o novo valor.
+                            A alteração será aplicada a <strong id="editarCount">0</strong> fonograma(s).
+                        </p>
+
+                        <div class="mb-3">
+                            <label for="campoEditar" class="form-label">Campo a Editar</label>
+                            <select class="form-select" id="campoEditar" name="campo" required>
+                                <option value="">Selecione...</option>
+                                <option value="genero">Gênero</option>
+                                <option value="versao">Versão</option>
+                                <option value="idioma">Idioma</option>
+                                <option value="prod_assoc">Associação do Produtor</option>
+                                <option value="assoc_gestao">Associação de Gestão</option>
+                                <option value="situacao">Situação</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="valorEditar" class="form-label">Novo Valor</label>
+                            <input type="text" class="form-control" id="valorEditar" name="valor"
+                                placeholder="Digite o novo valor" required>
+                            <div class="form-text" id="campoHelp"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Aplicar Alteração
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Fonogramas -->
+    <div class="table-responsive">
+        <table class="table-modern table-cards">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">
+                        <input type="checkbox" id="selectAll" class="form-check-input" title="Selecionar todos">
+                    </th>
+                    <th>ISRC</th>
+                    <th>Título</th>
+                    <th>Versão</th>
+                    <th>Duração</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in fonogramas.items %}
+                {% set status = f.status_ecad or 'NAO_ENVIADO' %}
+                {% set can_delete = status not in ['ENVIADO', 'ACEITO'] %}
+                <tr>
+                    <td data-label="Selecionar">
+                        {% if can_delete %}
+                        <input type="checkbox" class="form-check-input fonograma-checkbox" value="{{ f.id }}"
+                            data-isrc="{{ f.isrc }}">
+                        {% else %}
+                        <input type="checkbox" class="form-check-input" disabled
+                            title="Não pode excluir fonogramas enviados">
+                        {% endif %}
+                    </td>
+                    <td data-label="ISRC">
+                        <code style="color: var(--sbacem-roxo); font-weight: 600;">{{ f.isrc }}</code>
+                    </td>
+                    <td data-label="Título">
+                        <strong>{{ f.titulo }}</strong>
+                    </td>
+                    <td data-label="Versão">{{ f.versao or '-' }}</td>
+                    <td data-label="Duração">{{ f.duracao }}</td>
+                    <td data-label="Status">
+                        <span class="badge-status badge-status--{{ status|lower|replace(' ', '_') }}">
+                            <i class="bi bi-circle-fill"></i>
+                            {{ status|replace('_', ' ') }}
+                        </span>
+                    </td>
+                    <td data-label="Ações">
+                        <div class="d-flex gap-1">
+                            <a href="{{ url_for('usuario.detalhes_fonograma', fonograma_id=f.id) }}"
+                                class="btn-sbacem btn-sbacem--secondary btn-sbacem--sm" title="Ver">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if can_delete %}
+                            <a href="{{ url_for('usuario.editar_fonograma', fonograma_id=f.id) }}"
+                                class="btn-sbacem btn-sbacem--ghost btn-sbacem--sm" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" class="btn-sbacem btn-sbacem--danger btn-sbacem--sm" title="Excluir"
+                                onclick="excluirUnico({{ f.id }}, '{{ f.isrc }}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <i class="bi bi-music-note-list" style="font-size: 3rem; color: var(--sbacem-bege);"></i>
+                        <p class="text-muted mt-3">Nenhum fonograma encontrado.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginação Moderna -->
+    {% if fonogramas.pages > 1 %}
+    <nav class="mt-4">
+        <div class="pagination-modern">
+            <a class="pagination-modern__item {{ 'pagination-modern__item--disabled' if not fonogramas.has_prev }}"
+                href="{{ url_for('usuario.listar_fonogramas', page=fonogramas.prev_num) if fonogramas.has_prev else '#' }}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            {% for page_num in fonogramas.iter_pages() %}
+            {% if page_num %}
+            <a class="pagination-modern__item {{ 'pagination-modern__item--active' if page_num == fonogramas.page }}"
+                href="{{ url_for('usuario.listar_fonogramas', page=page_num) }}">
+                {{ page_num }}
+            </a>
+            {% else %}
+            <span class="pagination-modern__item pagination-modern__item--disabled">...</span>
+            {% endif %}
+            {% endfor %}
+            <a class="pagination-modern__item {{ 'pagination-modern__item--disabled' if not fonogramas.has_next }}"
+                href="{{ url_for('usuario.listar_fonogramas', page=fonogramas.next_num) if fonogramas.has_next else '#' }}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+</div>
+
+<script>
+    // Gerenciamento de seleção
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.fonograma-checkbox');
+        const bulkActions = document.getElementById('bulkActions');
+        const selectedCount = document.getElementById('selectedCount');
+
+        // Selecionar todos
+        selectAll?.addEventListener('change', function () {
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            updateBulkActions();
+        });
+
+        // Checkbox individual
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateBulkActions);
+        });
+
+        function updateBulkActions() {
+            const selected = document.querySelectorAll('.fonograma-checkbox:checked');
+            const count = selected.length;
+
+            if (count > 0) {
+                bulkActions.classList.remove('d-none');
+                selectedCount.textContent = count;
+            } else {
+                bulkActions.classList.add('d-none');
+            }
+
+            // Atualizar checkbox "selecionar todos"
+            if (selectAll) {
+                selectAll.checked = count === checkboxes.length && count > 0;
+                selectAll.indeterminate = count > 0 && count < checkboxes.length;
+            }
+        }
+    });
+
+    function deselectAll() {
+        document.querySelectorAll('.fonograma-checkbox').forEach(cb => cb.checked = false);
+        document.getElementById('selectAll').checked = false;
+        document.getElementById('bulkActions').classList.add('d-none');
+    }
+
+    function excluirUnico(id, isrc) {
+        if (confirm(`Tem certeza que deseja excluir o fonograma ${isrc}?`)) {
+            document.getElementById('fonogramaIds').value = id;
+            document.getElementById('formExclusaoMassa').submit();
+        }
+    }
+
+    function excluirSelecionados() {
+        const selected = document.querySelectorAll('.fonograma-checkbox:checked');
+        const ids = Array.from(selected).map(cb => cb.value);
+        const isrcs = Array.from(selected).map(cb => cb.dataset.isrc).slice(0, 3).join(', ');
+
+        const msg = ids.length === 1
+            ? `Tem certeza que deseja excluir o fonograma selecionado?`
+            : `Tem certeza que deseja excluir ${ids.length} fonogramas?\n\nPrimeiros: ${isrcs}...`;
+
+        if (confirm(msg)) {
+            document.getElementById('fonogramaIds').value = ids.join(',');
+            document.getElementById('formExclusaoMassa').submit();
+        }
+    }
+
+    // Sincronizar IDs selecionados com modal de edição
+    document.getElementById('modalEditarMassa')?.addEventListener('show.bs.modal', function () {
+        const selected = document.querySelectorAll('.fonograma-checkbox:checked');
+        const ids = Array.from(selected).map(cb => cb.value);
+        document.getElementById('editarFonogramaIds').value = ids.join(',');
+        document.getElementById('editarCount').textContent = ids.length;
+    });
+
+    // Mostrar dica de acordo com o campo selecionado
+    document.getElementById('campoEditar')?.addEventListener('change', function () {
+        const help = document.getElementById('campoHelp');
+        const hints = {
+            'genero': 'Ex: Pop, Rock, MPB, Sertanejo, Axé, Forró, etc.',
+            'versao': 'Ex: Original, Remix, Ao Vivo, Acústico, etc.',
+            'idioma': 'Ex: PT, EN, ES, FR, etc.',
+            'prod_assoc': 'Ex: ABRAMUS, UBC, AMAR, SICAM, SBACEM, etc.',
+            'assoc_gestao': 'Ex: ABRAMUS, UBC, AMAR, SICAM, SBACEM, etc.',
+            'situacao': 'Ex: ATIVO, INATIVO, PENDENTE, etc.'
+        };
+        help.textContent = hints[this.value] || '';
+    });
+</script>
+{% endblock usuario_content %}

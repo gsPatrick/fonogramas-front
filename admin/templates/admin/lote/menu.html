@@ -1,0 +1,81 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Operações em Lote{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+    <div class="row g-4 justify-content-center" style="max-width: 1000px;">
+        <div class="col-lg-3 col-md-6">
+            <div class="card h-100 shadow-sm text-center">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-file-earmark-spreadsheet display-4 text-primary"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Importar Fonogramas</h5>
+                    <p class="card-text text-muted small flex-grow-1">Importe novos fonogramas em massa através de
+                        planilhas Excel ou CSV.</p>
+                    <div class="mt-auto pt-3">
+                        <a href="{{ url_for('admin.importar_lote') }}" class="btn btn-primary px-4">
+                            <i class="bi bi-upload me-1"></i> Iniciar Importação
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card h-100 shadow-sm text-center">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-list-check display-4 text-warning"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Atualizar Status</h5>
+                    <p class="card-text text-muted small flex-grow-1">Atualize o status ECAD de múltiplos fonogramas de
+                        uma vez.</p>
+                    <div class="mt-auto pt-3">
+                        <a href="{{ url_for('admin.atualizar_status_lote') }}" class="btn btn-outline-primary px-4">
+                            <i class="bi bi-pencil-square me-1"></i> Atualizar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card h-100 shadow-sm text-center">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-pencil-square display-4 text-success"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Editar em Lote</h5>
+                    <p class="card-text text-muted small flex-grow-1">Altere campos de múltiplos fonogramas de uma vez
+                        (gênero, versão, etc).</p>
+                    <div class="mt-auto pt-3">
+                        <a href="{{ url_for('admin.editar_lote') }}" class="btn btn-outline-success px-4">
+                            <i class="bi bi-pencil me-1"></i> Editar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card h-100 shadow-sm text-center border-danger">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-trash display-4 text-danger"></i>
+                    </div>
+                    <h5 class="card-title text-danger mb-2">Exclusão em Massa</h5>
+                    <p class="card-text text-muted small flex-grow-1">Remova fonogramas incorretos ou duplicados em
+                        lote.</p>
+                    <div class="mt-auto pt-3">
+                        <a href="{{ url_for('admin.excluir_lote') }}" class="btn btn-outline-danger px-4">
+                            <i class="bi bi-trash me-1"></i> Excluir
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
