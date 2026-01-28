@@ -166,6 +166,14 @@ def serialize_fonograma(f, resumido=False):
         "cod_ecad": f.cod_ecad,
         "cod_interno": f.cod_interno,
         "cod_obra": f.cod_obra,
+        
+        # Novos campos
+        "pais_origem": f.pais_origem,
+        "paises_adicionais": f.paises_adicionais,
+        "flag_nacional": f.flag_nacional,
+        "classificacao_trilha": f.classificacao_trilha,
+        "tipo_arranjo": f.tipo_arranjo,
+        
         "prod_nome": f.prod_nome,
         "prod_doc": f.prod_doc,
         "prod_fantasia": f.prod_fantasia,
