@@ -60,10 +60,13 @@ def gerar_excel_ecad(fonogramas: List[Fonograma], output_path: str) -> Dict:
             'Ano de Lançamento': fono.ano_lanc,
             'Idioma': fono.idioma or '',
             'Gênero': fono.genero,
+            'Nacional/Internacional': fono.flag_nacional or '',
+            'Classificação Trilha': fono.classificacao_trilha or '',
             
             # Obra Musical
             'Título da Obra': fono.titulo_obra,
             'Código da Obra': fono.cod_obra or '',
+            'Tipo de Arranjo': fono.tipo_arranjo or '',
             
             # Autores (concatenados com ;)
             'Autores - Nome': ';'.join(autores_nomes),
@@ -91,6 +94,8 @@ def gerar_excel_ecad(fonogramas: List[Fonograma], output_path: str) -> Dict:
             'Selo': fono.selo or '',
             'Formato': fono.formato or '',
             'País': fono.pais or '',
+            'País de Origem': fono.pais_origem or '',
+            'Outros Países': fono.paises_adicionais or '',
             'Data de Lançamento': fono.data_lanc or '',
             
             # Administrativo
@@ -130,8 +135,11 @@ def gerar_excel_ecad(fonogramas: List[Fonograma], output_path: str) -> Dict:
         'Ano de Lançamento': 'identificacao',
         'Idioma': 'identificacao',
         'Gênero': 'identificacao',
+        'Nacional/Internacional': 'identificacao',
+        'Classificação Trilha': 'identificacao',
         'Título da Obra': 'obra',
         'Código da Obra': 'obra',
+        'Tipo de Arranjo': 'obra',
         'Autores - Nome': 'autores',
         'Autores - CPF': 'autores',
         'Autores - Função': 'autores',
@@ -151,6 +159,8 @@ def gerar_excel_ecad(fonogramas: List[Fonograma], output_path: str) -> Dict:
         'Selo': 'lancamento',
         'Formato': 'lancamento',
         'País': 'lancamento',
+        'País de Origem': 'lancamento',
+        'Outros Países': 'lancamento',
         'Data de Lançamento': 'lancamento',
         'Associação de Gestão': 'admin',
         'Território': 'admin',

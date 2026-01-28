@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizar Fonograma - FONOGRAMA</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -55,11 +57,11 @@
             try {
                 const res = await fetch(`/api/v1/fonogramas/${fonogramaId}`);
                 const response = await res.json();
-                
+
                 if (!response.success) {
                     throw new Error(response.error || 'Erro ao carregar fonograma');
                 }
-                
+
                 const fonograma = response.data;
                 renderizarFonograma(fonograma);
             } catch (err) {
@@ -83,12 +85,15 @@
                         <p><strong>Duração:</strong> ${f.duracao || '-'}</p>
                         <p><strong>Gênero:</strong> ${f.genero || '-'}</p>
                         <p><strong>Idioma:</strong> ${f.idioma || '-'}</p>
+                        <p><strong>Nacional/Internacional:</strong> ${f.flag_nacional || '-'}</p>
+                        <p><strong>Classificação Trilha:</strong> ${f.classificacao_trilha || '-'}</p>
                     </div>
 
                     <div class="info-card">
                         <h3>Obra Musical</h3>
                         <p><strong>Título da Obra:</strong> ${f.titulo_obra || '-'}</p>
                         <p><strong>Código da Obra:</strong> ${f.cod_obra || '-'}</p>
+                        <p><strong>Tipo de Arranjo:</strong> ${f.tipo_arranjo || '-'}</p>
                     </div>
 
                     <div class="info-card">
@@ -104,6 +109,8 @@
                         <p><strong>Ano de Lançamento:</strong> ${f.ano_lanc || '-'}</p>
                         <p><strong>Álbum:</strong> ${f.album || '-'}</p>
                         <p><strong>Selo:</strong> ${f.selo || '-'}</p>
+                        <p><strong>País de Origem:</strong> ${f.pais_origem || '-'}</p>
+                        <p><strong>Outros Países:</strong> ${f.paises_adicionais || '-'}</p>
                     </div>
 
                     <div class="info-card">
@@ -116,12 +123,12 @@
 
                     <div class="info-card">
                         <h3>Autores</h3>
-                        ${f.autores && f.autores.length > 0 ? 
-                            f.autores.map(a => `
+                        ${f.autores && f.autores.length > 0 ?
+                    f.autores.map(a => `
                                 <p><strong>${a.nome}</strong> (${a.funcao}) - ${a.percentual}%</p>
-                            `).join('') : 
-                            '<p>Nenhum autor cadastrado</p>'
-                        }
+                            `).join('') :
+                    '<p>Nenhum autor cadastrado</p>'
+                }
                     </div>
                 </div>
 
@@ -138,4 +145,5 @@
         carregarFonograma();
     </script>
 </body>
+
 </html>

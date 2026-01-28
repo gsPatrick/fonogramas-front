@@ -209,6 +209,13 @@ class Fonograma(db.Model):
     titulo_obra = db.Column(db.String(500), nullable=False)
     cod_obra = db.Column(db.String(100))
     
+    # NOVOS CAMPOS (Solicitação)
+    pais_origem = db.Column(db.String(100))
+    paises_adicionais = db.Column(db.Text)  # Lista de outros países
+    flag_nacional = db.Column(db.String(20))  # NACIONAL, INTERNACIONAL
+    classificacao_trilha = db.Column(db.String(50))
+    tipo_arranjo = db.Column(db.String(20))  # ORIGINAL, ARRANJO
+    
     # SEÇÃO 3 - TITULARES CONEXOS (relacionamentos separados)
     
     # SEÇÃO 4 - PRODUTOR
@@ -270,6 +277,11 @@ class Fonograma(db.Model):
             'cod_interno': self.cod_interno,
             'titulo_obra': self.titulo_obra,
             'cod_obra': self.cod_obra,
+            'pais_origem': self.pais_origem,
+            'paises_adicionais': self.paises_adicionais,
+            'flag_nacional': self.flag_nacional,
+            'classificacao_trilha': self.classificacao_trilha,
+            'tipo_arranjo': self.tipo_arranjo,
             'prod_nome': self.prod_nome,
             'prod_doc': self.prod_doc,
             'prod_fantasia': self.prod_fantasia,

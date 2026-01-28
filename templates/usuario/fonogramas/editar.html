@@ -102,6 +102,23 @@
                             <input type="text" class="form-control" name="cod_interno"
                                 value="{{ fonograma.cod_interno }}">
                         </div>
+
+                        <!-- Novos Campos Identificação -->
+                        <div class="col-md-6">
+                            <label class="form-label">Nacional/Internacional</label>
+                            <select class="form-select" name="flag_nacional">
+                                <option value="">Selecione...</option>
+                                <option value="NACIONAL" {{ 'selected' if fonograma.flag_nacional=='NACIONAL' }}>
+                                    Nacional</option>
+                                <option value="INTERNACIONAL" {{ 'selected' if fonograma.flag_nacional=='INTERNACIONAL'
+                                    }}>Internacional</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Classificação Trilha</label>
+                            <input type="text" class="form-control" name="classificacao_trilha"
+                                value="{{ fonograma.classificacao_trilha }}" placeholder="Ex: Original, Adaptada...">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -113,14 +130,24 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-8">
+                        <div class="col-md-6">
                             <label class="form-label">Título da Obra *</label>
                             <input type="text" class="form-control" name="titulo_obra" required
                                 value="{{ fonograma.titulo_obra }}">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Código da Obra</label>
                             <input type="text" class="form-control" name="cod_obra" value="{{ fonograma.cod_obra }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo de Arranjo</label>
+                            <select class="form-select" name="tipo_arranjo">
+                                <option value="">Selecione...</option>
+                                <option value="ORIGINAL" {{ 'selected' if fonograma.tipo_arranjo=='ORIGINAL' }}>Original
+                                </option>
+                                <option value="ARRANJO" {{ 'selected' if fonograma.tipo_arranjo=='ARRANJO' }}>Arranjo
+                                </option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -232,13 +259,23 @@
                             <input type="text" class="form-control" name="selo" value="{{ fonograma.selo }}">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">País</label>
+                            <label class="form-label">País Lançamento</label>
                             <input type="text" class="form-control" name="pais" value="{{ fonograma.pais }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">País de Origem</label>
+                            <input type="text" class="form-control" name="pais_origem"
+                                value="{{ fonograma.pais_origem }}">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Data de Lançamento</label>
                             <input type="text" class="form-control" name="data_lanc" placeholder="dd/mm/yyyy"
                                 value="{{ fonograma.data_lanc }}">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Outros Países (Separar por vírgula se houver mais de um)</label>
+                            <textarea class="form-control" name="paises_adicionais"
+                                rows="2">{{ fonograma.paises_adicionais }}</textarea>
                         </div>
                     </div>
                 </div>

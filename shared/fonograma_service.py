@@ -54,6 +54,14 @@ def criar_fonograma_do_dataframe(row: Dict) -> Fonograma:
         cod_interno=safe_str(row.get('cod_interno')) or None,
         titulo_obra=safe_str(row.get('titulo_obra')),
         cod_obra=safe_str(row.get('cod_obra')) or None,
+        cod_obra=safe_str(row.get('cod_obra')) or None,
+        # Novos campos
+        pais_origem=safe_str(row.get('pais_origem')) or None,
+        paises_adicionais=safe_str(row.get('paises_adicionais')) or None,
+        flag_nacional=safe_str(row.get('flag_nacional')) or None,
+        classificacao_trilha=safe_str(row.get('classificacao_trilha')) or None,
+        tipo_arranjo=safe_str(row.get('tipo_arranjo')) or None,
+        
         prod_nome=safe_str(row.get('prod_nome')),
         prod_doc=limpar_documento(safe_str(row.get('prod_doc'))),
         prod_fantasia=safe_str(row.get('prod_fantasia')) or None,
@@ -203,6 +211,15 @@ def atualizar_fonograma_do_dataframe(fonograma: Fonograma, row: Dict) -> Fonogra
     fonograma.cod_interno = row.get('cod_interno', '').strip() or None
     fonograma.titulo_obra = row.get('titulo_obra', '').strip()
     fonograma.cod_obra = row.get('cod_obra', '').strip() or None
+    fonograma.cod_obra = row.get('cod_obra', '').strip() or None
+    
+    # Novos campos
+    fonograma.pais_origem = row.get('pais_origem', '').strip() or None
+    fonograma.paises_adicionais = row.get('paises_adicionais', '').strip() or None
+    fonograma.flag_nacional = row.get('flag_nacional', '').strip() or None
+    fonograma.classificacao_trilha = row.get('classificacao_trilha', '').strip() or None
+    fonograma.tipo_arranjo = row.get('tipo_arranjo', '').strip() or None
+    
     fonograma.prod_nome = row.get('prod_nome', '').strip()
     fonograma.prod_doc = limpar_documento(row.get('prod_doc', ''))
     fonograma.prod_fantasia = row.get('prod_fantasia', '').strip() or None
