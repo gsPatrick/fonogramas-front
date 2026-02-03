@@ -265,6 +265,24 @@ def importar_lote():
             
     return render_template('admin/lote/importar.html')
 
+@admin_bp.route('/lote/template')
+@admin_required
+def download_template_lote():
+    """Download do template Excel para importação em lote"""
+    from usuario.services.upload_service import gerar_template
+    
+    # Gerar template (reutilizando serviço do usuário ou criando específico)
+    # Aqui vamos usar uma versão simplificada ou reutilizar o do usuário se adequado
+    # Para admin, vamos usar o mesmo gerador para consistência
+    arquivo = gerar_template()
+    
+    return send_file(
+        arquivo, 
+        as_attachment=True, 
+        download_name='template_importacao.xlsx',
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
 @admin_bp.route('/lote/atualizar-status', methods=['GET', 'POST'])
 @admin_required
 def atualizar_status_lote():
@@ -298,9 +316,7 @@ def excluir_lote():
         ids_texto = request.form.get('fonograma_ids_texto', '').strip()
         ids_checkbox = request.form.getlist('fonograma_ids')
         
-        # Debug: mostra o que chegou
-        print(f"[DEBUG] ids_texto: '{ids_texto}'")
-        print(f"[DEBUG] ids_checkbox: {ids_checkbox}")
+        # Debug removido
         
         # Combina ambas as fontes de IDs
         fonograma_ids = []
@@ -312,7 +328,7 @@ def excluir_lote():
         # Remove duplicatas
         fonograma_ids = list(set(fonograma_ids))
         
-        print(f"[DEBUG] fonograma_ids final: {fonograma_ids}")
+
         
         confirmar = request.form.get('confirmar')
         
@@ -326,7 +342,7 @@ def excluir_lote():
         
         resultado = lote_service.excluir_em_lote(fonograma_ids, current_user)
         
-        print(f"[DEBUG] Resultado: {resultado}")
+
         
         if resultado['sucesso']:
             flash(f'{resultado["excluidos"]} fonograma(s) excluído(s) com sucesso!', 'success')

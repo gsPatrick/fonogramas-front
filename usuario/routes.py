@@ -204,7 +204,6 @@ def excluir_fonogramas_massa():
 @usuario_required
 def editar_fonogramas_massa():
     """Editar múltiplos fonogramas de uma vez"""
-    from models import db
     
     ids_str = request.form.get('fonograma_ids', '')
     campo = request.form.get('campo', '').strip()
@@ -295,8 +294,8 @@ def upload_arquivo():
         if is_ajax:
             # Modo API para o Conversor (script.js)
             try:
-                if not arquivo.filename.lower().endswith('.csv'):
-                     return jsonify({'erro': 'Apenas arquivos CSV são aceitos para conversão.'}), 400
+                if not arquivo.filename.lower().endswith(('.csv', '.xls', '.xlsx')):
+                     return jsonify({'erro': 'Apenas arquivos CSV ou Excel (.xls, .xlsx) são aceitos para conversão.'}), 400
 
                 resultado = upload_service.processar_para_frontend(arquivo)
                 

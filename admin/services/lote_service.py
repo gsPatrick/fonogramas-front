@@ -127,7 +127,7 @@ def executar_importacao(arquivo, usuario):
         import pandas as pd
         
         # Ler arquivo
-        if arquivo.filename.endswith('.xlsx'):
+        if arquivo.filename.lower().endswith(('.xlsx', '.xls')):
             df = pd.read_excel(arquivo)
         else:
             df = pd.read_csv(arquivo, encoding='utf-8', on_bad_lines='skip')

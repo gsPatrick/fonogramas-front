@@ -58,8 +58,9 @@ function handleFileSelect(e) {
 }
 
 function handleFile(file) {
-    if (!file.name.toLowerCase().endsWith('.csv')) {
-        alert('Por favor, selecione um arquivo CSV.');
+    const name = file.name.toLowerCase();
+    if (!name.endsWith('.csv') && !name.endsWith('.xls') && !name.endsWith('.xlsx')) {
+        alert('Por favor, selecione um arquivo CSV ou Excel (.xls, .xlsx).');
         return;
     }
 

@@ -54,7 +54,6 @@ def criar_fonograma_do_dataframe(row: Dict) -> Fonograma:
         cod_interno=safe_str(row.get('cod_interno')) or None,
         titulo_obra=safe_str(row.get('titulo_obra')),
         cod_obra=safe_str(row.get('cod_obra')) or None,
-        cod_obra=safe_str(row.get('cod_obra')) or None,
         # Novos campos
         pais_origem=safe_str(row.get('pais_origem')) or None,
         paises_adicionais=safe_str(row.get('paises_adicionais')) or None,
