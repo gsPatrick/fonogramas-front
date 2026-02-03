@@ -102,16 +102,55 @@ def salvar_fonogramas(resultado_validacao, usuario, salvar_apenas_validos=False)
 
 def gerar_template():
     """Gera template Excel para download"""
-    # ... Lógica de geração de template ou retornar estático
-    # Para simplificar, vamos criar um df vazio com colunas
-    colunas = [
-        'isrc', 'titulo', 'duracao', 'ano_lanc', 'genero', 'versao',
-        'autores', 'interpretes', 'musicos', 'produtor'
-    ]
+    # Mapeamento de colunas internas -> Template ECAD
+    MAPEAMENTO_COLUNAS_EXPORT = {
+        'isrc': 'ISRC *',
+        'titulo': 'Título *',
+        'duracao': 'Duração *',
+        'ano_lanc': 'Ano Lanc. *',
+        'genero': 'Gênero *',
+        'titulo_obra': 'Título Obra *',
+        'autores': 'Autores * (Nome|CPF|Função|%)',
+        'interpretes': 'Intérpretes (Nome|Doc|Cat|%|Assoc)',
+        'prod_nome': 'Produtor Nome *',
+        'prod_doc': 'Produtor Doc *',
+        'prod_perc': 'Produtor % *',
+        'versao': 'Versão',
+        'idioma': 'Idioma',
+        'ano_grav': 'Ano Grav.',
+        'cod_interno': 'Cód. Interno',
+        'cod_obra': 'Cód. Obra',
+        'editoras': 'Editoras (Nome|CNPJ|%)',
+        'musicos': 'Músicos (Nome|CPF|Instr|Tipo|%)',
+        'prod_fantasia': 'Prod. Fantasia',
+        'prod_assoc': 'Prod. Assoc.',
+        'tipo_lanc': 'Tipo Lanç.',
+        'album': 'Álbum',
+        'faixa': 'Faixa',
+        'formato': 'Formato',
+        'situacao': 'Situação',
+        'territorio': 'Território',
+        # Campos Novos
+        'pais_origem': 'País Origem',
+        'paises_adicionais': 'Países Adicionais',
+        'flag_nacional': 'Nacional/Internacional',
+        'classificacao_trilha': 'Classificação Trilha',
+        'tipo_arranjo': 'Tipo Arranjo'
+    }
+
+    # Criar DataFrame vazio com as colunas na ordem correta
+    colunas = list(MAPEAMENTO_COLUNAS_EXPORT.values())
     df = pd.DataFrame(columns=colunas)
+    
+    # Criar arquivo temporário
     arquivo = tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False)
-    df.to_excel(arquivo.name, index=False)
-    return arquivo.name
+    temp_path = arquivo.name
+    arquivo.close()
+    
+    # Gerar Excel estilizado
+    _gerar_excel_estilizado(df, temp_path)
+    
+    return temp_path
 
 def validar_campo_individual(campo, valor):
     """Valida um campo individualmente"""
