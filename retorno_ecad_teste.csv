@@ -1,0 +1,3 @@
+ISRC,STATUS,COD_ECAD,CODIGO_ERRO,MENSAGEM
+BRBIO2600001,ACEITO,12345678,,Cadastro realizado com sucesso
+BRBIO2600002,RECUSADO,,E004,CPF do produtor inválido ou inconsistente
