@@ -66,6 +66,10 @@ if errorlevel 1 (
 echo Dependencias instaladas.
 echo.
 
+echo [Extra] Verificando usuario Admin...
+python scripts/create_admin.py
+echo.
+
 echo ========================================================
 echo           REINSTALACAO CONCLUIDA!
 echo ========================================================
