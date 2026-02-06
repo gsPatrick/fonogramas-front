@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 echo ========================================================
 echo       PROCESSO DE REINSTALACAO LIMPA DO SISTEMA
 echo ========================================================
