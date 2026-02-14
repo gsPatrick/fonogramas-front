@@ -60,6 +60,8 @@ def criar_fonograma_do_dataframe(row: Dict) -> Fonograma:
         flag_nacional=safe_str(row.get('flag_nacional')) or None,
         classificacao_trilha=safe_str(row.get('classificacao_trilha')) or None,
         tipo_arranjo=safe_str(row.get('tipo_arranjo')) or None,
+        subdivisao_estrangeiro=safe_str(row.get('subdivisao_estrangeiro')) or None,
+        publicacao_simultanea=bool(row.get('publicacao_simultanea')) if row.get('publicacao_simultanea') else False,
         
         prod_nome=safe_str(row.get('prod_nome')),
         prod_doc=limpar_documento(safe_str(row.get('prod_doc'))),
@@ -87,40 +89,63 @@ def criar_fonograma_do_dataframe(row: Dict) -> Fonograma:
     )
     
     # Adiciona autores
-    autores_data = parse_autores(row.get('autores', ''))
+    autores_input = row.get('autores')
+    if isinstance(autores_input, list):
+        autores_data = autores_input
+    else:
+        autores_data = parse_autores(autores_input or '')
     for autor_data in autores_data:
         autor = Autor(
             nome=autor_data['nome'],
             cpf=autor_data['cpf'],
             funcao=autor_data['funcao'],
-            percentual=autor_data['percentual']
+            percentual=autor_data['percentual'],
+            cae_ipi=autor_data.get('cae_ipi') or None,
+            data_nascimento=autor_data.get('data_nascimento') or None,
+            nacionalidade=autor_data.get('nacionalidade') or None
         )
         fonograma.autores_list.append(autor)
     
     # Adiciona editoras
-    editoras_data = parse_editoras(row.get('editoras', ''))
+    editoras_input = row.get('editoras')
+    if isinstance(editoras_input, list):
+        editoras_data = editoras_input
+    else:
+        editoras_data = parse_editoras(editoras_input or '')
     for editora_data in editoras_data:
         editora = Editora(
             nome=editora_data['nome'],
             cnpj=editora_data['cnpj'],
-            percentual=editora_data['percentual']
+            percentual=editora_data['percentual'],
+            nacionalidade=editora_data.get('nacionalidade') or None
         )
         fonograma.editoras_list.append(editora)
     
     # Adiciona intérpretes
-    interpretes_data = parse_interpretes(row.get('interpretes', ''))
+    interpretes_input = row.get('interpretes')
+    if isinstance(interpretes_input, list):
+        interpretes_data = interpretes_input
+    else:
+        interpretes_data = parse_interpretes(interpretes_input or '')
     for interprete_data in interpretes_data:
         interprete = Interprete(
             nome=interprete_data['nome'],
             doc=interprete_data['doc'],
             categoria=interprete_data['categoria'],
             percentual=interprete_data['percentual'],
-            associacao=interprete_data.get('associacao', '') or None
+            associacao=interprete_data.get('associacao', '') or None,
+            cae_ipi=interprete_data.get('cae_ipi') or None,
+            data_nascimento=interprete_data.get('data_nascimento') or None,
+            nacionalidade=interprete_data.get('nacionalidade') or None
         )
         fonograma.interpretes_list.append(interprete)
     
     # Adiciona músicos
-    musicos_data = parse_musicos(row.get('musicos', ''))
+    musicos_input = row.get('musicos')
+    if isinstance(musicos_input, list):
+        musicos_data = musicos_input
+    else:
+        musicos_data = parse_musicos(musicos_input or '')
     for musico_data in musicos_data:
         musico = Musico(
             nome=musico_data['nome'],
@@ -132,7 +157,11 @@ def criar_fonograma_do_dataframe(row: Dict) -> Fonograma:
         fonograma.musicos_list.append(musico)
     
     # Adiciona documentos
-    documentos_data = parse_documentos(row.get('documentos', ''))
+    documentos_input = row.get('documentos')
+    if isinstance(documentos_input, list):
+        documentos_data = documentos_input
+    else:
+        documentos_data = parse_documentos(documentos_input or '')
     for documento_data in documentos_data:
         documento = Documento(
             tipo=documento_data['tipo'],
@@ -218,6 +247,8 @@ def atualizar_fonograma_do_dataframe(fonograma: Fonograma, row: Dict) -> Fonogra
     fonograma.flag_nacional = row.get('flag_nacional', '').strip() or None
     fonograma.classificacao_trilha = row.get('classificacao_trilha', '').strip() or None
     fonograma.tipo_arranjo = row.get('tipo_arranjo', '').strip() or None
+    fonograma.subdivisao_estrangeiro = row.get('subdivisao_estrangeiro', '').strip() or None
+    fonograma.publicacao_simultanea = bool(row.get('publicacao_simultanea')) if row.get('publicacao_simultanea') else False
     
     fonograma.prod_nome = row.get('prod_nome', '').strip()
     fonograma.prod_doc = limpar_documento(row.get('prod_doc', ''))
@@ -251,37 +282,60 @@ def atualizar_fonograma_do_dataframe(fonograma: Fonograma, row: Dict) -> Fonogra
     Documento.query.filter_by(fonograma_id=fonograma.id).delete()
     
     # Adiciona novos relacionamentos
-    autores_data = parse_autores(row.get('autores', ''))
+    autores_input = row.get('autores')
+    if isinstance(autores_input, list):
+        autores_data = autores_input
+    else:
+        autores_data = parse_autores(autores_input or '')
     for autor_data in autores_data:
         autor = Autor(
             nome=autor_data['nome'],
             cpf=autor_data['cpf'],
             funcao=autor_data['funcao'],
-            percentual=autor_data['percentual']
+            percentual=autor_data['percentual'],
+            cae_ipi=autor_data.get('cae_ipi') or None,
+            data_nascimento=autor_data.get('data_nascimento') or None,
+            nacionalidade=autor_data.get('nacionalidade') or None
         )
         fonograma.autores_list.append(autor)
     
-    editoras_data = parse_editoras(row.get('editoras', ''))
+    editoras_input = row.get('editoras')
+    if isinstance(editoras_input, list):
+        editoras_data = editoras_input
+    else:
+        editoras_data = parse_editoras(editoras_input or '')
     for editora_data in editoras_data:
         editora = Editora(
             nome=editora_data['nome'],
             cnpj=editora_data['cnpj'],
-            percentual=editora_data['percentual']
+            percentual=editora_data['percentual'],
+            nacionalidade=editora_data.get('nacionalidade') or None
         )
         fonograma.editoras_list.append(editora)
     
-    interpretes_data = parse_interpretes(row.get('interpretes', ''))
+    interpretes_input = row.get('interpretes')
+    if isinstance(interpretes_input, list):
+        interpretes_data = interpretes_input
+    else:
+        interpretes_data = parse_interpretes(interpretes_input or '')
     for interprete_data in interpretes_data:
         interprete = Interprete(
             nome=interprete_data['nome'],
             doc=interprete_data['doc'],
             categoria=interprete_data['categoria'],
             percentual=interprete_data['percentual'],
-            associacao=interprete_data.get('associacao', '') or None
+            associacao=interprete_data.get('associacao', '') or None,
+            cae_ipi=interprete_data.get('cae_ipi') or None,
+            data_nascimento=interprete_data.get('data_nascimento') or None,
+            nacionalidade=interprete_data.get('nacionalidade') or None
         )
         fonograma.interpretes_list.append(interprete)
     
-    musicos_data = parse_musicos(row.get('musicos', ''))
+    musicos_input = row.get('musicos')
+    if isinstance(musicos_input, list):
+        musicos_data = musicos_input
+    else:
+        musicos_data = parse_musicos(musicos_input or '')
     for musico_data in musicos_data:
         musico = Musico(
             nome=musico_data['nome'],
@@ -292,7 +346,11 @@ def atualizar_fonograma_do_dataframe(fonograma: Fonograma, row: Dict) -> Fonogra
         )
         fonograma.musicos_list.append(musico)
     
-    documentos_data = parse_documentos(row.get('documentos', ''))
+    documentos_input = row.get('documentos')
+    if isinstance(documentos_input, list):
+        documentos_data = documentos_input
+    else:
+        documentos_data = parse_documentos(documentos_input or '')
     for documento_data in documentos_data:
         documento = Documento(
             tipo=documento_data['tipo'],

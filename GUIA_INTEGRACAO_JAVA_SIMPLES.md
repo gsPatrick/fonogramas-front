@@ -1,6 +1,146 @@
-# 🔌 Guia Simples: Como Integrar com o Sistema Java
+# 🔌 Guia Simples: Como Integrar com o Sistema Java (Atualizado)
 
-Este guia explica, passo a passo, como fazer seu sistema Java se comunicar com o Sistema de Fonogramas SBACEM.
+Este guia explica como fazer seu sistema Java se comunicar com a API do Sistema de Fonogramas SBACEM, incluindo autenticação e envio de listas de participantes.
+
+---
+
+## 📋 Pré-requisitos
+
+O cliente Java atualizado utiliza a biblioteca **Jackson** para processar JSON.
+Adicione ao seu `pom.xml` (Maven):
+
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.15.2</version>
+</dependency>
+```
+
+---
+
+## 🚀 Passo 1: Iniciar o Servidor SBACEM
+
+Certifique-se de que o servidor Python está rodando:
+```bash
+python app.py
+```
+(Ou use `INICIAR_SERVIDOR.bat` no Windows)
+
+---
+
+## 🔐 Passo 2: Usar o Cliente Java
+
+O arquivo `exemplos_java/ClienteFonogramasAPI.java` já contém toda a lógica necessária.
+Veja como usar no seu código:
+
+### 1. Inicialização e Login (Obrigatório)
+
+O sistema agora exige login para todas as operações. O cliente gerencia os cookies de sessão automaticamente.
+
+```java
+import com.sbacem.fonogramas.ClienteFonogramasAPI;
+
+public class Main {
+    public static void main(String[] args) {
+        // Conectar
+        ClienteFonogramasAPI cliente = new ClienteFonogramasAPI("http://localhost:5001");
+        
+        // Fazer Login
+        var login = cliente.login("admin@sbacem.org.br", "admin123");
+        
+        if (login.isSuccess()) {
+            System.out.println("Login OK!");
+        } else {
+            System.out.println("Erro: " + login.getMessage());
+            return;
+        }
+        
+        // Agora você pode chamar outros métodos...
+    }
+}
+```
+
+---
+
+## ➕ Passo 3: Criar Fonograma com Participantes
+
+Agora você pode (e deve) enviar as listas de Autores, Intérpretes e Músicos diretamente no JSON.
+
+```java
+Map<String, Object> novoFonograma = new HashMap<>();
+novoFonograma.put("isrc", "BRUM72600001");
+novoFonograma.put("titulo", "Minha Música Nova");
+// ... outros campos básicos
+
+// Adicionar Autores
+List<Map<String, Object>> autores = new ArrayList<>();
+Map<String, Object> autor = new HashMap<>();
+autor.put("nome", "João Silva");
+autor.put("cpf", "111.222.333-44");
+autor.put("funcao", "AUTOR"); // AUTOR, COMPOSITOR, VERSIONISTA
+autor.put("percentual", 100.0);
+autores.add(autor);
+
+novoFonograma.put("autores", autores);
+
+// Adicionar Intérpretes
+List<Map<String, Object>> interpretes = new ArrayList<>();
+Map<String, Object> interprete = new HashMap<>();
+interprete.put("nome", "Banda Legal");
+interprete.put("categoria", "INTERPRETE");
+interprete.put("percentual", 100.0);
+interpretes.add(interprete);
+
+novoFonograma.put("interpretes", interpretes);
+
+// Enviar
+var resposta = cliente.criarFonograma(novoFonograma);
+```
+
+### Alternativa: Requisição Simples (Form Data)
+
+Se você **não quiser usar JSON/Jackson**, pode enviar os dados como formulário (`application/x-www-form-urlencoded`).
+A API agora aceita ambos os formatos.
+
+Exemplo sem biblioteca JSON:
+```java
+String dados = "isrc=BRUM72600002&titulo=Musica Sem Json&prod_perc=100";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("http://localhost:5001/api/fonogramas"))
+    .header("Content-Type", "application/x-www-form-urlencoded")
+    .POST(HttpRequest.BodyPublishers.ofString(dados))
+    .build();
+```
+*Nota: Para listas complexas (autores/intérpretes), recomendamos usar JSON, pois o formato de formulário para listas pode ser verboso (`autores[0][nome]=...`).*
+
+---
+
+## 📡 Endpoints Disponíveis
+
+| Método | Função Java | Descrição |
+|--------|-------------|-----------|
+| `login` | `cliente.login(email, senha)` | Autentica e inicia sessão |
+| `logout` | `cliente.logout()` | Encerra sessão |
+| `listarFonogramas` | `cliente.listarFonogramas(...)` | Lista com filtros |
+| `obterFonograma` | `cliente.obterFonograma(id)` | Busca por ID |
+| `obterFonogramaPorISRC` | `cliente.obterFonogramaPorISRC(isrc)` | Busca por ISRC |
+| `criarFonograma` | `cliente.criarFonograma(dados)` | Cria novo registro |
+| `atualizarFonograma` | `cliente.atualizarFonograma(id, dados)` | Atualiza existente |
+| `deletarFonograma` | `cliente.deletarFonograma(id)` | Remove registro |
+
+---
+
+## 🧪 Teste Automatizado
+
+Foi criado um arquivo `exemplos_java/TestarAPI.java` que demonstra o fluxo completo:
+1. Conecta
+2. Faz Login
+3. Cria Fonograma completo
+4. Verifica os dados
+
+Você pode usar este arquivo como base para seus testes de integração.
 
 ---
 

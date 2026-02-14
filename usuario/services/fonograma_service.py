@@ -218,6 +218,80 @@ def excluir_fonograma(fonograma, usuario):
 
 def obter_historico_usuario(usuario, page=1, per_page=20):
     """Obtém histórico de alterações feitas pelo usuário"""
-    return HistoricoFonograma.query.filter_by(usuario=usuario.email)\
-        .order_by(HistoricoFonograma.data_alteracao.desc())\
-        .paginate(page=page, per_page=per_page)
+
+def processar_dados_formulario(form):
+    """
+    Processa o formulário (request.form) para extrair listas de participantes
+    e retorna um dicionário compatível com criar_fonograma_do_dataframe (shared).
+    """
+    dados = form.to_dict(flat=True)
+    
+    # --- AUTORES ---
+    autores = []
+    nomes = form.getlist('autores_nome[]')
+    cpfs = form.getlist('autores_cpf[]')
+    funcoes = form.getlist('autores_funcao[]')
+    percs = form.getlist('autores_percentual[]')
+    caes = form.getlist('autores_cae[]')
+    nacs = form.getlist('autores_nacionalidade[]')
+    dtnascs = form.getlist('autores_dtnasc[]') # Data Nascimento
+    
+    for i in range(len(nomes)):
+        if nomes[i] and nomes[i].strip():
+            autores.append({
+                'nome': nomes[i].strip(),
+                'cpf': cpfs[i].strip() if i < len(cpfs) else '',
+                'funcao': funcoes[i].strip() if i < len(funcoes) else 'AUTOR',
+                'percentual': float(percs[i].replace(',', '.')) if i < len(percs) and percs[i] else 0.0,
+                'cae_ipi': caes[i].strip() if i < len(caes) else None,
+                'nacionalidade': nacs[i].strip() if i < len(nacs) else None,
+                'data_nascimento': dtnascs[i].strip() if i < len(dtnascs) else None
+            })
+    if autores:
+        dados['autores'] = autores
+
+    # --- INTÉRPRETES ---
+    interpretes = []
+    nomes = form.getlist('interpretes_nome[]')
+    docs = form.getlist('interpretes_doc[]')
+    cats = form.getlist('interpretes_categoria[]')
+    percs = form.getlist('interpretes_percentual[]')
+    assocs = form.getlist('interpretes_assoc[]')
+    caes = form.getlist('interpretes_cae[]')
+    nacs = form.getlist('interpretes_nacionalidade[]')
+    
+    for i in range(len(nomes)):
+        if nomes[i] and nomes[i].strip():
+            interpretes.append({
+                'nome': nomes[i].strip(),
+                'doc': docs[i].strip() if i < len(docs) else '',
+                'categoria': cats[i].strip() if i < len(cats) else 'INTERPRETE',
+                'percentual': float(percs[i].replace(',', '.')) if i < len(percs) and percs[i] else 0.0,
+                'associacao': assocs[i].strip() if i < len(assocs) else None,
+                'cae_ipi': caes[i].strip() if i < len(caes) else None,
+                'nacionalidade': nacs[i].strip() if i < len(nacs) else None
+            })
+    if interpretes:
+        dados['interpretes'] = interpretes
+
+    # --- MÚSICOS ---
+    musicos = []
+    nomes = form.getlist('musicos_nome[]')
+    cpfs = form.getlist('musicos_cpf[]')
+    insts = form.getlist('musicos_instrumento[]')
+    tipos = form.getlist('musicos_tipo[]')
+    percs = form.getlist('musicos_percentual[]')
+    
+    for i in range(len(nomes)):
+        if nomes[i] and nomes[i].strip():
+            musicos.append({
+                'nome': nomes[i].strip(),
+                'cpf': cpfs[i].strip() if i < len(cpfs) else '',
+                'instrumento': insts[i].strip() if i < len(insts) else '',
+                'tipo': tipos[i].strip() if i < len(tipos) else 'ACOMPANHANTE',
+                'percentual': float(percs[i].replace(',', '.')) if i < len(percs) and percs[i] else 0.0
+            })
+    if musicos:
+        dados['musicos'] = musicos
+        
+    return dados

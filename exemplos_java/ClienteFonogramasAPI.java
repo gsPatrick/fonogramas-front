@@ -1,15 +1,17 @@
 package com.sbacem.fonogramas;
 
+import java.net.CookieManager;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Cliente Java para API de Fonogramas ECAD/ABRAMUS
+ * Cliente Java para API de Fonogramas ECAD/SBACEM
  * 
  * Requer Java 11+ e Jackson para JSON
  * 
@@ -28,10 +30,57 @@ public class ClienteFonogramasAPI {
     
     public ClienteFonogramasAPI(String baseUrl) {
         this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        
+        // Configura HttpClient com CookieManager para manter a sessão (Login)
         this.httpClient = HttpClient.newBuilder()
+            .cookieHandler(new CookieManager())
             .connectTimeout(Duration.ofSeconds(10))
             .build();
+            
         this.objectMapper = new ObjectMapper();
+    }
+    
+    /**
+     * Realiza login no sistema
+     */
+    public ApiResponse login(String email, String password) {
+        try {
+            Map<String, String> credenciais = new HashMap<>();
+            credenciais.put("email", email);
+            credenciais.put("password", password);
+            
+            String json = objectMapper.writeValueAsString(credenciais);
+            
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + "/api/auth/login"))
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .header("Content-Type", "application/json")
+                .build();
+            
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return objectMapper.readValue(response.body(), ApiResponse.class);
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao realizar login", e);
+        }
+    }
+
+    /**
+     * Realiza logout do sistema
+     */
+    public ApiResponse logout() {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + "/api/auth/logout"))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+            
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return objectMapper.readValue(response.body(), ApiResponse.class);
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao realizar logout", e);
+        }
     }
     
     /**
@@ -39,15 +88,15 @@ public class ClienteFonogramasAPI {
      */
     public ApiResponse listarFonogramas(int page, int perPage, String search, String situacao) {
         try {
-            StringBuilder url = new StringBuilder(baseUrl + "/api/v1/fonogramas");
+            StringBuilder url = new StringBuilder(baseUrl + "/api/fonogramas");
             url.append("?page=").append(page);
             url.append("&per_page=").append(perPage);
             
             if (search != null && !search.isEmpty()) {
-                url.append("&search=").append(java.net.URLEncoder.encode(search, "UTF-8"));
+                url.append("&busca=").append(java.net.URLEncoder.encode(search, "UTF-8"));
             }
             if (situacao != null && !situacao.isEmpty()) {
-                url.append("&situacao=").append(situacao);
+                url.append("&status=").append(situacao);
             }
             
             HttpRequest request = HttpRequest.newBuilder()
@@ -70,7 +119,7 @@ public class ClienteFonogramasAPI {
     public ApiResponse obterFonograma(int id) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/v1/fonogramas/" + id))
+                .uri(URI.create(baseUrl + "/api/fonogramas/" + id))
                 .GET()
                 .header("Content-Type", "application/json")
                 .build();
@@ -89,7 +138,7 @@ public class ClienteFonogramasAPI {
     public ApiResponse obterFonogramaPorISRC(String isrc) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/v1/fonogramas/isrc/" + isrc))
+                .uri(URI.create(baseUrl + "/api/fonogramas/isrc/" + isrc))
                 .GET()
                 .header("Content-Type", "application/json")
                 .build();
@@ -110,7 +159,7 @@ public class ClienteFonogramasAPI {
             String json = objectMapper.writeValueAsString(dadosFonograma);
             
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/v1/fonogramas"))
+                .uri(URI.create(baseUrl + "/api/fonogramas"))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
@@ -131,7 +180,7 @@ public class ClienteFonogramasAPI {
             String json = objectMapper.writeValueAsString(dadosFonograma);
             
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/v1/fonogramas/" + id))
+                .uri(URI.create(baseUrl + "/api/fonogramas/" + id))
                 .PUT(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
@@ -150,7 +199,7 @@ public class ClienteFonogramasAPI {
     public ApiResponse deletarFonograma(int id) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/v1/fonogramas/" + id))
+                .uri(URI.create(baseUrl + "/api/fonogramas/" + id))
                 .DELETE()
                 .header("Content-Type", "application/json")
                 .build();
@@ -169,7 +218,7 @@ public class ClienteFonogramasAPI {
     public ApiResponse obterEstatisticas() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/v1/stats"))
+                .uri(URI.create(baseUrl + "/api/fonogramas/stats"))
                 .GET()
                 .header("Content-Type", "application/json")
                 .build();
@@ -207,9 +256,8 @@ public class ClienteFonogramasAPI {
         private boolean success;
         private Object data;
         private String message;
-        private String error;
-        private String code;
-        private String timestamp;
+        private Object error; // Pode ser String ou Objeto
+        private Map<String, Object> meta;
         
         // Getters e Setters
         public boolean isSuccess() { return success; }
@@ -221,38 +269,11 @@ public class ClienteFonogramasAPI {
         public String getMessage() { return message; }
         public void setMessage(String message) { this.message = message; }
         
-        public String getError() { return error; }
-        public void setError(String error) { this.error = error; }
+        public Object getError() { return error; }
+        public void setError(Object error) { this.error = error; }
         
-        public String getCode() { return code; }
-        public void setCode(String code) { this.code = code; }
-        
-        public String getTimestamp() { return timestamp; }
-        public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
-    }
-    
-    /**
-     * Exemplo de uso
-     */
-    public static void main(String[] args) {
-        ClienteFonogramasAPI cliente = new ClienteFonogramasAPI("http://localhost:5001");
-        
-        try {
-            // Health check
-            ApiResponse health = cliente.healthCheck();
-            System.out.println("API Status: " + health.isSuccess());
-            
-            // Listar fonogramas
-            ApiResponse lista = cliente.listarFonogramas(1, 20, null, null);
-            System.out.println("Total de fonogramas: " + lista.getData());
-            
-            // Obter por ISRC
-            ApiResponse fonograma = cliente.obterFonogramaPorISRC("BRUM71601234");
-            System.out.println("Fonograma encontrado: " + fonograma.isSuccess());
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        public Map<String, Object> getMeta() { return meta; }
+        public void setMeta(Map<String, Object> meta) { this.meta = meta; }
     }
 }
 

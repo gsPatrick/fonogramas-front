@@ -2,7 +2,7 @@
 
 {% block page_title %}Editar: {{ fonograma.titulo }}{% endblock %}
 
-{% block content %}
+{% block usuario_content %}
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <form method="POST">
@@ -106,7 +106,8 @@
                         <!-- Novos Campos Identificação -->
                         <div class="col-md-6">
                             <label class="form-label">Nacional/Internacional</label>
-                            <select class="form-select" name="flag_nacional">
+                            <select class="form-select" name="flag_nacional" id="flag_nacional_edit"
+                                onchange="toggleSubdivisaoEdit()">
                                 <option value="">Selecione...</option>
                                 <option value="NACIONAL" {{ 'selected' if fonograma.flag_nacional=='NACIONAL' }}>
                                     Nacional</option>
@@ -140,14 +141,230 @@
                             <input type="text" class="form-control" name="cod_obra" value="{{ fonograma.cod_obra }}">
                         </div>
                         <div class="col-md-3">
+                            <label class="form-label">Nacional/Internacional</label>
+                            <select class="form-select" name="flag_nacional" id="flag_nacional_edit"
+                                onchange="toggleSubdivisaoEdit()">
+                                <option value="">Selecione...</option>
+                                <option value="NACIONAL" {{ 'selected' if fonograma.flag_nacional=='NACIONAL' }}>
+                                    Nacional</option>
+                                <option value="INTERNACIONAL" {{ 'selected' if fonograma.flag_nacional=='INTERNACIONAL'
+                                    }}>Internacional</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label">Tipo de Arranjo</label>
                             <select class="form-select" name="tipo_arranjo">
                                 <option value="">Selecione...</option>
-                                <option value="ORIGINAL" {{ 'selected' if fonograma.tipo_arranjo=='ORIGINAL' }}>Original
+                                <option value="ORIGINAL" {{ 'selected' if fonograma.tipo_arranjo=='ORIGINAL' }}>
+                                    Original
                                 </option>
-                                <option value="ARRANJO" {{ 'selected' if fonograma.tipo_arranjo=='ARRANJO' }}>Arranjo
+                                <option value="ARRANJO" {{ 'selected' if fonograma.tipo_arranjo=='ARRANJO' }}>
+                                    Arranjo
                                 </option>
                             </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" name="publicacao_simultanea"
+                                    id="publicacao_simultanea_edit" value="1" {{ 'checked' if
+                                    fonograma.publicacao_simultanea }}>
+                                <label class="form-check-label" for="publicacao_simultanea_edit">
+                                    Publicação Simultânea
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" id="div_subdivisao_edit" style="display: none;">
+                            <label class="form-label">Subdivisão (Estrangeiro)</label>
+                            <input type="text" class="form-control" name="subdivisao_estrangeiro"
+                                placeholder="Subdivisão para fonogramas estrangeiros"
+                                value="{{ fonograma.subdivisao_estrangeiro }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 3 - TITULARES E PARTICIPANTES -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <i class="bi bi-people me-2"></i>3. Titulares e Participantes
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="participantesTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="autores-tab" data-bs-toggle="tab"
+                                data-bs-target="#autores" type="button" role="tab">Autores</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="interpretes-tab" data-bs-toggle="tab"
+                                data-bs-target="#interpretes" type="button" role="tab">Intérpretes</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="musicos-tab" data-bs-toggle="tab" data-bs-target="#musicos"
+                                type="button" role="tab">Músicos</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content p-3 border border-top-0 rounded-bottom" id="participantesTabContent">
+
+                        <!-- AUTORES -->
+                        <div class="tab-pane show active" id="autores" role="tabpanel">
+                            <div id="container-autores">
+                                {% for autor in fonograma.autores_list %}
+                                <div class="row g-2 mb-2 border-bottom pb-2">
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Nome Completo</label>
+                                        <input type="text" class="form-control form-control-sm" name="autores_nome[]"
+                                            required value="{{ autor.nome }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">CPF</label>
+                                        <input type="text" class="form-control form-control-sm" name="autores_cpf[]"
+                                            value="{{ autor.cpf }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Função</label>
+                                        <select class="form-select form-select-sm" name="autores_funcao[]">
+                                            <option value="AUTOR" {{ 'selected' if autor.funcao=='AUTOR' }}>Autor
+                                            </option>
+                                            <option value="COMPOSITOR" {{ 'selected' if autor.funcao=='COMPOSITOR' }}>
+                                                Compositor</option>
+                                            <option value="VERSIONISTA" {{ 'selected' if autor.funcao=='VERSIONISTA' }}>
+                                                Versionista</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label small">%</label>
+                                        <input type="text" class="form-control form-control-sm"
+                                            name="autores_percentual[]" value="{{ autor.percentual }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">CAE/IPI</label>
+                                        <input type="text" class="form-control form-control-sm" name="autores_cae[]"
+                                            value="{{ autor.cae_ipi or '' }}">
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label small"></label>
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                            onclick="this.parentElement.parentElement.remove()"><i
+                                                class="bi bi-trash"></i></button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                                onclick="adicionarAutor()">
+                                <i class="bi bi-plus-circle me-1"></i>Adicionar Autor
+                            </button>
+                        </div>
+
+                        <!-- INTÉRPRETES -->
+                        <div class="tab-pane" id="interpretes" role="tabpanel">
+                            <div id="container-interpretes">
+                                {% for interprete in fonograma.interpretes_list %}
+                                <div class="row g-2 mb-2 border-bottom pb-2">
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Nome Artístico</label>
+                                        <input type="text" class="form-control form-control-sm"
+                                            name="interpretes_nome[]" required value="{{ interprete.nome }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">CPF/CNPJ</label>
+                                        <input type="text" class="form-control form-control-sm" name="interpretes_doc[]"
+                                            value="{{ interprete.doc }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Categoria</label>
+                                        <select class="form-select form-select-sm" name="interpretes_categoria[]">
+                                            <option value="INTERPRETE" {{ 'selected' if
+                                                interprete.categoria=='INTERPRETE' }}>Intérprete</option>
+                                            <option value="MUSICO" {{ 'selected' if interprete.categoria=='MUSICO' }}>
+                                                Músico</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label small">%</label>
+                                        <input type="text" class="form-control form-control-sm"
+                                            name="interpretes_percentual[]" value="{{ interprete.percentual }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Associação</label>
+                                        <select class="form-select form-select-sm" name="interpretes_assoc[]">
+                                            <option value="">Selecione...</option>
+                                            <option value="ABRAMUS" {{ 'selected' if interprete.associacao=='ABRAMUS'
+                                                }}>ABRAMUS</option>
+                                            <option value="UBC" {{ 'selected' if interprete.associacao=='UBC' }}>UBC
+                                            </option>
+                                            <option value="AMAR" {{ 'selected' if interprete.associacao=='AMAR' }}>
+                                                AMAR
+                                            </option>
+                                            <option value="SBACEM" {{ 'selected' if interprete.associacao=='SBACEM' }}>
+                                                SBACEM</option>
+                                            <option value="SICAM" {{ 'selected' if interprete.associacao=='SICAM' }}>
+                                                SICAM</option>
+                                            <option value="SOCINPRO" {{ 'selected' if interprete.associacao=='SOCINPRO'
+                                                }}>SOCINPRO</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label small"></label>
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                            onclick="this.parentElement.parentElement.remove()"><i
+                                                class="bi bi-trash"></i></button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                                onclick="adicionarInterprete()">
+                                <i class="bi bi-plus-circle me-1"></i>Adicionar Intérprete
+                            </button>
+                        </div>
+
+                        <!-- MÚSICOS -->
+                        <div class="tab-pane" id="musicos" role="tabpanel">
+                            <div id="container-musicos">
+                                {% for musico in fonograma.musicos_list %}
+                                <div class="row g-2 mb-2 border-bottom pb-2">
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Nome</label>
+                                        <input type="text" class="form-control form-control-sm" name="musicos_nome[]"
+                                            required value="{{ musico.nome }}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">CPF</label>
+                                        <input type="text" class="form-control form-control-sm" name="musicos_cpf[]"
+                                            value="{{ musico.cpf }}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Instrumento</label>
+                                        <input type="text" class="form-control form-control-sm"
+                                            name="musicos_instrumento[]" value="{{ musico.instrumento }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Tipo</label>
+                                        <select class="form-select form-select-sm" name="musicos_tipo[]">
+                                            <option value="ACOMPANHANTE" {{ 'selected' if musico.tipo=='ACOMPANHANTE'
+                                                }}>Acompanhante</option>
+                                            <option value="SOLISTA" {{ 'selected' if musico.tipo=='SOLISTA' }}>
+                                                Solista
+                                            </option>
+                                            <option value="ARRANJADOR" {{ 'selected' if musico.tipo=='ARRANJADOR' }}>
+                                                Arranjador</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label small"></label>
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                            onclick="this.parentElement.parentElement.remove()"><i
+                                                class="bi bi-trash"></i></button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                                onclick="adicionarMusico()">
+                                <i class="bi bi-plus-circle me-1"></i>Adicionar Músico
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -194,8 +411,10 @@
                                 <option value="AMAR" {{ 'selected' if fonograma.prod_assoc=='AMAR' }}>AMAR</option>
                                 <option value="SBACEM" {{ 'selected' if fonograma.prod_assoc=='SBACEM' }}>SBACEM
                                 </option>
-                                <option value="SICAM" {{ 'selected' if fonograma.prod_assoc=='SICAM' }}>SICAM</option>
-                                <option value="SOCINPRO" {{ 'selected' if fonograma.prod_assoc=='SOCINPRO' }}>SOCINPRO
+                                <option value="SICAM" {{ 'selected' if fonograma.prod_assoc=='SICAM' }}>SICAM
+                                </option>
+                                <option value="SOCINPRO" {{ 'selected' if fonograma.prod_assoc=='SOCINPRO' }}>
+                                    SOCINPRO
                                 </option>
                             </select>
                         </div>
@@ -225,8 +444,10 @@
                             <label class="form-label">Tipo de Lançamento</label>
                             <select class="form-select" name="tipo_lanc">
                                 <option value="">Selecione...</option>
-                                <option value="ALBUM" {{ 'selected' if fonograma.tipo_lanc=='ALBUM' }}>Álbum</option>
-                                <option value="SINGLE" {{ 'selected' if fonograma.tipo_lanc=='SINGLE' }}>Single</option>
+                                <option value="ALBUM" {{ 'selected' if fonograma.tipo_lanc=='ALBUM' }}>Álbum
+                                </option>
+                                <option value="SINGLE" {{ 'selected' if fonograma.tipo_lanc=='SINGLE' }}>Single
+                                </option>
                                 <option value="EP" {{ 'selected' if fonograma.tipo_lanc=='EP' }}>EP</option>
                                 <option value="COMPILACAO" {{ 'selected' if fonograma.tipo_lanc=='COMPILACAO' }}>
                                     Compilação</option>
@@ -249,7 +470,8 @@
                                 <option value="">Selecione...</option>
                                 <option value="DIGITAL" {{ 'selected' if fonograma.formato=='DIGITAL' }}>Digital
                                 </option>
-                                <option value="FISICO" {{ 'selected' if fonograma.formato=='FISICO' }}>Físico</option>
+                                <option value="FISICO" {{ 'selected' if fonograma.formato=='FISICO' }}>Físico
+                                </option>
                                 <option value="AMBOS" {{ 'selected' if fonograma.formato=='AMBOS' }}>Ambos</option>
                             </select>
                         </div>
@@ -273,7 +495,8 @@
                                 value="{{ fonograma.data_lanc }}">
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label">Outros Países (Separar por vírgula se houver mais de um)</label>
+                            <label class="form-label">Outros Países (Separar por vírgula se houver mais de
+                                um)</label>
                             <textarea class="form-control" name="paises_adicionais"
                                 rows="2">{{ fonograma.paises_adicionais }}</textarea>
                         </div>
@@ -324,7 +547,8 @@
                                 </option>
                                 <option value="INTERNACIONAL" {{ 'selected' if fonograma.territorio=='INTERNACIONAL' }}>
                                     Internacional</option>
-                                <option value="AMBOS" {{ 'selected' if fonograma.territorio=='AMBOS' }}>Ambos</option>
+                                <option value="AMBOS" {{ 'selected' if fonograma.territorio=='AMBOS' }}>Ambos
+                                </option>
                                 <option value="AMERICA_LATINA" {{ 'selected' if fonograma.territorio=='AMERICA_LATINA'
                                     }}>América Latina</option>
                             </select>
@@ -333,12 +557,15 @@
                             <label class="form-label">Tipos de Execução</label>
                             <select class="form-select" name="tipos_exec">
                                 <option value="">Selecione...</option>
-                                <option value="TODOS" {{ 'selected' if fonograma.tipos_exec=='TODOS' }}>Todos</option>
-                                <option value="RADIO" {{ 'selected' if fonograma.tipos_exec=='RADIO' }}>Rádio</option>
+                                <option value="TODOS" {{ 'selected' if fonograma.tipos_exec=='TODOS' }}>Todos
+                                </option>
+                                <option value="RADIO" {{ 'selected' if fonograma.tipos_exec=='RADIO' }}>Rádio
+                                </option>
                                 <option value="TV" {{ 'selected' if fonograma.tipos_exec=='TV' }}>TV</option>
                                 <option value="STREAMING" {{ 'selected' if fonograma.tipos_exec=='STREAMING' }}>
                                     Streaming</option>
-                                <option value="SHOWS" {{ 'selected' if fonograma.tipos_exec=='SHOWS' }}>Shows</option>
+                                <option value="SHOWS" {{ 'selected' if fonograma.tipos_exec=='SHOWS' }}>Shows
+                                </option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -380,4 +607,155 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleSubdivisaoEdit() {
+        var elFlag = document.getElementById('flag_nacional_edit');
+        if (!elFlag) return;
+        var flag = elFlag.value;
+        var divSub = document.getElementById('div_subdivisao_edit');
+
+        if (divSub) {
+            if (flag === 'INTERNACIONAL') {
+                divSub.style.display = '';
+            } else {
+                divSub.style.display = 'none';
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleSubdivisaoEdit();
+        // Inicializar abas explicitamente
+        var triggerTabList = [].slice.call(document.querySelectorAll('#participantesTab button'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        })
+    });
+
+    // --- FUNÇÕES PARA CAMPOS DINÂMICOS ---
+
+    function criarBotaoRemover() {
+        return '<button type="button" class="btn btn-outline-danger btn-sm" onclick="this.parentElement.parentElement.remove()"><i class="bi bi-trash"></i></button>';
+    }
+
+    function adicionarAutor() {
+        const container = document.getElementById('container-autores');
+        const div = document.createElement('div');
+        div.className = 'row g-2 mb-2 border-bottom pb-2';
+        div.innerHTML = `
+            <div class="col-md-3">
+                <label class="form-label small">Nome Completo</label>
+                <input type="text" class="form-control form-control-sm" name="autores_nome[]" required placeholder="Nome do Autor">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">CPF</label>
+                <input type="text" class="form-control form-control-sm" name="autores_cpf[]" placeholder="CPF (somente números)">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Função</label>
+                <select class="form-select form-select-sm" name="autores_funcao[]">
+                    <option value="AUTOR">Autor</option>
+                    <option value="COMPOSITOR">Compositor</option>
+                    <option value="VERSIONISTA">Versionista</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small">%</label>
+                <input type="text" class="form-control form-control-sm" name="autores_percentual[]" placeholder="100">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">CAE/IPI</label>
+                <input type="text" class="form-control form-control-sm" name="autores_cae[]">
+            </div>
+             <div class="col-md-1">
+                <label class="form-label small"></label>
+                ${criarBotaoRemover()}
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function adicionarInterprete() {
+        const container = document.getElementById('container-interpretes');
+        const div = document.createElement('div');
+        div.className = 'row g-2 mb-2 border-bottom pb-2';
+        div.innerHTML = `
+            <div class="col-md-3">
+                <label class="form-label small">Nome Artístico/Civil</label>
+                <input type="text" class="form-control form-control-sm" name="interpretes_nome[]" required placeholder="Nome do Intérprete">
+            </div>
+             <div class="col-md-2">
+                <label class="form-label small">CPF/CNPJ</label>
+                <input type="text" class="form-control form-control-sm" name="interpretes_doc[]">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Categoria</label>
+                <select class="form-select form-select-sm" name="interpretes_categoria[]">
+                    <option value="INTERPRETE">Intérprete</option>
+                    <option value="MUSICO">Músico</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small">%</label>
+                <input type="text" class="form-control form-control-sm" name="interpretes_percentual[]" placeholder="100">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Associação</label>
+                <select class="form-select form-select-sm" name="interpretes_assoc[]">
+                    <option value="">Selecione...</option>
+                    <option value="ABRAMUS">ABRAMUS</option>
+                    <option value="UBC">UBC</option>
+                    <option value="AMAR">AMAR</option>
+                    <option value="SBACEM">SBACEM</option>
+                    <option value="SICAM">SICAM</option>
+                    <option value="SOCINPRO">SOCINPRO</option>
+                </select>
+            </div>
+             <div class="col-md-1">
+                <label class="form-label small"></label>
+                ${criarBotaoRemover()}
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function adicionarMusico() {
+        const container = document.getElementById('container-musicos');
+        const div = document.createElement('div');
+        div.className = 'row g-2 mb-2 border-bottom pb-2';
+        div.innerHTML = `
+            <div class="col-md-3">
+                <label class="form-label small">Nome</label>
+                <input type="text" class="form-control form-control-sm" name="musicos_nome[]" required placeholder="Nome do Músico">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">CPF</label>
+                <input type="text" class="form-control form-control-sm" name="musicos_cpf[]">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Instrumento</label>
+                <input type="text" class="form-control form-control-sm" name="musicos_instrumento[]" placeholder="Ex: Baixo">
+            </div>
+             <div class="col-md-2">
+                <label class="form-label small">Tipo</label>
+                <select class="form-select form-select-sm" name="musicos_tipo[]">
+                    <option value="ACOMPANHANTE">Acompanhante</option>
+                    <option value="SOLISTA">Solista</option>
+                    <option value="ARRANJADOR">Arranjador</option>
+                </select>
+            </div>
+             <div class="col-md-1">
+                <label class="form-label small"></label>
+                ${criarBotaoRemover()}
+            </div>
+        `;
+        container.appendChild(div);
+    }
+</script>
 {% endblock %}

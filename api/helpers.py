@@ -190,6 +190,48 @@ def serialize_fonograma(f, resumido=False):
         "territorio": f.territorio,
         "prioridade": f.prioridade,
         "created_at": f.created_at.isoformat() if f.created_at else None,
-        "updated_at": f.updated_at.isoformat() if f.updated_at else None
+        "updated_at": f.updated_at.isoformat() if f.updated_at else None,
+        
+        # Listas de Participantes
+        "autores": [
+            {
+                "nome": a.nome,
+                "cpf": a.cpf,
+                "funcao": a.funcao,
+                "percentual": a.percentual,
+                "cae_ipi": a.cae_ipi,
+                "data_nascimento": a.data_nascimento.isoformat() if a.data_nascimento else None,
+                "nacionalidade": a.nacionalidade
+            } for a in f.autores_list
+        ],
+        "interpretes": [
+            {
+                "nome": i.nome,
+                "doc": i.doc,
+                "categoria": i.categoria,
+                "percentual": i.percentual,
+                "associacao": i.associacao,
+                "cae_ipi": i.cae_ipi,
+                "data_nascimento": i.data_nascimento.isoformat() if i.data_nascimento else None,
+                "nacionalidade": i.nacionalidade
+            } for i in f.interpretes_list
+        ],
+        "musicos": [
+            {
+                "nome": m.nome,
+                "cpf": m.cpf,
+                "instrumento": m.instrumento,
+                "tipo": m.tipo,
+                "percentual": m.percentual
+            } for m in f.musicos_list
+        ],
+        "editoras": [
+            {
+                "nome": e.nome,
+                "cnpj": e.cnpj,
+                "percentual": e.percentual,
+                "nacionalidade": e.nacionalidade
+            } for e in f.editoras_list
+        ]
     }
 

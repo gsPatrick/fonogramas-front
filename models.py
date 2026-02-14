@@ -72,6 +72,9 @@ class Autor(db.Model):
     cpf = db.Column(db.String(11), nullable=False)
     funcao = db.Column(db.String(50), nullable=False)  # COMPOSITOR, LETRISTA, etc
     percentual = db.Column(db.Float, nullable=False)
+    cae_ipi = db.Column(db.String(20))  # Código IPI/CAE internacional
+    data_nascimento = db.Column(db.String(10))  # dd/mm/yyyy
+    nacionalidade = db.Column(db.String(50))  # BRASILEIRO, ESTRANGEIRO, etc
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     fonograma = db.relationship('Fonograma', backref=db.backref('autores_list', lazy=True, cascade='all, delete-orphan'))
@@ -82,7 +85,10 @@ class Autor(db.Model):
             'nome': self.nome,
             'cpf': self.cpf,
             'funcao': self.funcao,
-            'percentual': self.percentual
+            'percentual': self.percentual,
+            'cae_ipi': self.cae_ipi,
+            'data_nascimento': self.data_nascimento,
+            'nacionalidade': self.nacionalidade
         }
 
 
@@ -95,6 +101,7 @@ class Editora(db.Model):
     nome = db.Column(db.String(200), nullable=False)
     cnpj = db.Column(db.String(14), nullable=False)
     percentual = db.Column(db.Float, nullable=False)
+    nacionalidade = db.Column(db.String(50))  # BRASILEIRA, ESTRANGEIRA
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     fonograma = db.relationship('Fonograma', backref=db.backref('editoras_list', lazy=True, cascade='all, delete-orphan'))
@@ -104,7 +111,8 @@ class Editora(db.Model):
             'id': self.id,
             'nome': self.nome,
             'cnpj': self.cnpj,
-            'percentual': self.percentual
+            'percentual': self.percentual,
+            'nacionalidade': self.nacionalidade
         }
 
 
@@ -119,6 +127,9 @@ class Interprete(db.Model):
     categoria = db.Column(db.String(50), nullable=False)  # PRINCIPAL, COADJUVANTE, etc
     percentual = db.Column(db.Float, nullable=False)
     associacao = db.Column(db.String(50))
+    cae_ipi = db.Column(db.String(20))  # Código IPI/CAE internacional
+    data_nascimento = db.Column(db.String(10))  # dd/mm/yyyy
+    nacionalidade = db.Column(db.String(50))  # BRASILEIRO, ESTRANGEIRO, etc
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     fonograma = db.relationship('Fonograma', backref=db.backref('interpretes_list', lazy=True, cascade='all, delete-orphan'))
@@ -130,7 +141,10 @@ class Interprete(db.Model):
             'doc': self.doc,
             'categoria': self.categoria,
             'percentual': self.percentual,
-            'associacao': self.associacao
+            'associacao': self.associacao,
+            'cae_ipi': self.cae_ipi,
+            'data_nascimento': self.data_nascimento,
+            'nacionalidade': self.nacionalidade
         }
 
 
@@ -215,6 +229,8 @@ class Fonograma(db.Model):
     flag_nacional = db.Column(db.String(20))  # NACIONAL, INTERNACIONAL
     classificacao_trilha = db.Column(db.String(50))
     tipo_arranjo = db.Column(db.String(20))  # ORIGINAL, ARRANJO
+    subdivisao_estrangeiro = db.Column(db.String(50))  # Subdivisão para fonogramas estrangeiros
+    publicacao_simultanea = db.Column(db.Boolean, default=False)  # Publicação simultânea
     
     # SEÇÃO 3 - TITULARES CONEXOS (relacionamentos separados)
     
@@ -282,6 +298,8 @@ class Fonograma(db.Model):
             'flag_nacional': self.flag_nacional,
             'classificacao_trilha': self.classificacao_trilha,
             'tipo_arranjo': self.tipo_arranjo,
+            'subdivisao_estrangeiro': self.subdivisao_estrangeiro,
+            'publicacao_simultanea': self.publicacao_simultanea,
             'prod_nome': self.prod_nome,
             'prod_doc': self.prod_doc,
             'prod_fantasia': self.prod_fantasia,
@@ -396,7 +414,7 @@ class RetornoECAD(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relacionamento
-    fonograma = db.relationship('Fonograma', backref=db.backref('retornos_ecad', lazy=True))
+    fonograma = db.relationship('Fonograma', backref=db.backref('retornos_ecad', lazy=True, cascade='all, delete-orphan'))
     
     def to_dict(self):
         """Converte retorno para dicionário"""

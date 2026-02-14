@@ -1,6 +1,6 @@
 # admin/services/envio_service.py
 from models import db, Fonograma, EnvioECAD, HistoricoFonograma
-from shared.gerador_ecad import gerar_excel_ecad, gerar_exp_ecad, validar_antes_envio
+from shared.gerador_ecad import gerar_excel_ecad, gerar_exp_ecad, gerar_txt_ecad, validar_antes_envio
 from datetime import datetime
 import uuid
 import os
@@ -45,9 +45,12 @@ def criar_envio(fonograma_ids, formato, usuario):
         if formato == 'EXCEL':
             arquivo_path = os.path.join(UPLOAD_FOLDER, f"{protocolo}.xlsx")
             resultado_arquivo = gerar_excel_ecad(fonogramas, arquivo_path)
+        elif formato == 'TXT_ECAD':
+            arquivo_path = os.path.join(UPLOAD_FOLDER, f"{protocolo}.txt")
+            resultado_arquivo = gerar_txt_ecad(fonogramas, arquivo_path)
         else:
-            arquivo_path = os.path.join(UPLOAD_FOLDER, f"{protocolo}.exp")
-            resultado_arquivo = gerar_exp_ecad(fonogramas, arquivo_path)
+            arquivo_path = os.path.join(UPLOAD_FOLDER, f"{protocolo}.txt")
+            resultado_arquivo = gerar_txt_ecad(fonogramas, arquivo_path)
         
         # Criar registro de envio
         envio = EnvioECAD(

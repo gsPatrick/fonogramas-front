@@ -184,7 +184,10 @@ def criar_fonograma():
     from models import db, Fonograma
     from shared.validador import validar_isrc
     
-    data = request.get_json()
+    # Tenta obter JSON, se falhar tenta Form Data
+    data = request.get_json(silent=True)
+    if not data:
+        data = request.form.to_dict()
     
     if not data:
         return api_error("Dados não fornecidos", "VALIDATION_ERROR", status=400)
@@ -213,28 +216,16 @@ def criar_fonograma():
         )
     
     try:
-        fonograma = Fonograma(
-            isrc=isrc,
-            titulo=titulo,
-            titulo_obra=data.get('titulo_obra', titulo),
-            duracao=data.get('duracao'),
-            ano_lanc=data.get('ano_lanc'),
-            ano_grav=data.get('ano_grav'),
-            genero=data.get('genero'),
-            versao=data.get('versao'),
-            idioma=data.get('idioma'),
-            prod_nome=data.get('prod_nome'),
-            prod_doc=data.get('prod_doc'),
-            prod_fantasia=data.get('prod_fantasia'),
-            prod_perc=data.get('prod_perc'),
-            album=data.get('album'),
-            selo=data.get('selo'),
-            pais=data.get('pais', 'Brasil'),
-            formato=data.get('formato'),
-            tipo_lanc=data.get('tipo_lanc'),
-            status_ecad='PENDENTE',
-            user_id=current_user.id
-        )
+        from shared.fonograma_service import criar_fonograma_do_dataframe
+        
+        # O serviço espera um dicionário similar ao Pandas, mas funciona com dict normal
+        # Precisamos garantir campos obrigatórios
+        data['isrc'] = isrc
+        data['titulo'] = titulo
+        
+        fonograma = criar_fonograma_do_dataframe(data)
+        fonograma.user_id = current_user.id
+        fonograma.status_ecad = 'PENDENTE'
         
         db.session.add(fonograma)
         db.session.commit()
@@ -305,25 +296,19 @@ def atualizar_fonograma(id):
             status=403
         )
     
-    data = request.get_json()
+    # Tenta obter JSON, se falhar tenta Form Data
+    data = request.get_json(silent=True)
+    if not data:
+        data = request.form.to_dict()
     
     if not data:
         return api_error("Dados não fornecidos", "VALIDATION_ERROR", status=400)
     
-    # Campos que podem ser atualizados
-    campos_permitidos = [
-        'titulo', 'titulo_obra', 'duracao', 'ano_lanc', 'ano_grav',
-        'genero', 'versao', 'idioma', 'cod_interno', 'cod_obra',
-        'prod_nome', 'prod_doc', 'prod_fantasia', 'prod_perc', 'prod_assoc',
-        'album', 'faixa', 'selo', 'formato', 'pais', 'tipo_lanc',
-        'situacao', 'territorio', 'prioridade'
-    ]
-    
-    for campo in campos_permitidos:
-        if campo in data:
-            setattr(fonograma, campo, data[campo])
-    
     try:
+        from shared.fonograma_service import atualizar_fonograma_do_dataframe
+        
+        atualizar_fonograma_do_dataframe(fonograma, data)
+    
         db.session.commit()
         return api_response(
             data={"id": fonograma.id},

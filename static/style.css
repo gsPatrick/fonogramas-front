@@ -889,6 +889,27 @@ footer {
     background: rgba(255, 255, 255, 0.2);
 }
 
+/* Correção para ABAS (Tabs) dentro de cards brancos */
+.nav-tabs .nav-link {
+    color: var(--cor-primaria) !important;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-tabs .nav-link:hover {
+    background: rgba(var(--cor-primaria-rgb), 0.05);
+    border-color: transparent;
+    color: var(--cor-secundaria) !important;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--cor-secundaria) !important;
+    background: transparent;
+    border-bottom: 2px solid var(--cor-secundaria);
+    font-weight: 700;
+}
+
 /* Listagem */
 .list-section {
     padding: 40px;
@@ -1905,13 +1926,13 @@ textarea.form-control {
     border-bottom-color: var(--cor-secundaria);
 }
 
-.tab-content {
+/* .tab-content {
     display: none;
 }
 
 .tab-content.active {
     display: block;
-}
+} */
 
 /* Seleção de Fonogramas */
 .selecao-section {

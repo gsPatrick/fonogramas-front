@@ -2,7 +2,7 @@
 
 {% block page_title %}Novo Fonograma{% endblock %}
 
-{% block content %}
+{% block usuario_content %}
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <form method="POST">
@@ -128,6 +128,108 @@
                             <label class="form-label">Código da Obra</label>
                             <input type="text" class="form-control" name="cod_obra"
                                 value="{{ dados.cod_obra if dados }}">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Nacional/Internacional</label>
+                            <select class="form-select" name="flag_nacional" id="flag_nacional"
+                                onchange="toggleSubdivisao()">
+                                <option value="">Selecione...</option>
+                                <option value="NACIONAL" {{ 'selected' if dados and dados.flag_nacional=='NACIONAL' }}>
+                                    Nacional</option>
+                                <option value="INTERNACIONAL" {{ 'selected' if dados and
+                                    dados.flag_nacional=='INTERNACIONAL' }}>Internacional</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tipo de Arranjo</label>
+                            <select class="form-select" name="tipo_arranjo">
+                                <option value="">Selecione...</option>
+                                <option value="ORIGINAL" {{ 'selected' if dados and dados.tipo_arranjo=='ORIGINAL' }}>
+                                    Original</option>
+                                <option value="ARRANJO" {{ 'selected' if dados and dados.tipo_arranjo=='ARRANJO' }}>
+                                    Arranjo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" name="publicacao_simultanea"
+                                    id="publicacao_simultanea" value="1" {{ 'checked' if dados and
+                                    dados.publicacao_simultanea }}>
+                                <label class="form-check-label" for="publicacao_simultanea">
+                                    Publicação Simultânea
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" id="div_subdivisao" style="display: none;">
+                            <label class="form-label">Subdivisão (Estrangeiro)</label>
+                            <input type="text" class="form-control" name="subdivisao_estrangeiro"
+                                placeholder="Subdivisão para fonogramas estrangeiros"
+                                value="{{ dados.subdivisao_estrangeiro if dados }}">
+                        </div>
+                        <div class="col-md-6" id="div_pais_origem" style="display: none;">
+                            <label class="form-label">País de Origem</label>
+                            <input type="text" class="form-control" name="pais_origem"
+                                value="{{ dados.pais_origem if dados }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 3 - TITULARES E PARTICIPANTES -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <i class="bi bi-people me-2"></i>3. Titulares e Participantes
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="participantesTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="autores-tab" data-bs-toggle="tab"
+                                data-bs-target="#autores" type="button" role="tab">Autores</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="interpretes-tab" data-bs-toggle="tab"
+                                data-bs-target="#interpretes" type="button" role="tab">Intérpretes</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="musicos-tab" data-bs-toggle="tab" data-bs-target="#musicos"
+                                type="button" role="tab">Músicos</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content p-3 border border-top-0 rounded-bottom" id="participantesTabContent">
+
+                        <!-- AUTORES -->
+                        <div class="tab-pane show active" id="autores" role="tabpanel">
+                            <div id="container-autores">
+                                <!-- Linhas de autores serão inseridas aqui -->
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                                onclick="adicionarAutor()">
+                                <i class="bi bi-plus-circle me-1"></i>Adicionar Autor
+                            </button>
+                        </div>
+
+                        <!-- INTÉRPRETES -->
+                        <div class="tab-pane" id="interpretes" role="tabpanel">
+                            <div id="container-interpretes">
+                                <!-- Linhas de intérpretes serão inseridas aqui -->
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                                onclick="adicionarInterprete()">
+                                <i class="bi bi-plus-circle me-1"></i>Adicionar Intérprete
+                            </button>
+                        </div>
+
+                        <!-- MÚSICOS -->
+                        <div class="tab-pane" id="musicos" role="tabpanel">
+                            <div id="container-musicos">
+                                <!-- Linhas de músicos serão inseridas aqui -->
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                                onclick="adicionarMusico()">
+                                <i class="bi bi-plus-circle me-1"></i>Adicionar Músico
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -352,4 +454,175 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleSubdivisao() {
+        var flag = document.getElementById('flag_nacional').value;
+        var divSub = document.getElementById('div_subdivisao');
+        var divPais = document.getElementById('div_pais_origem');
+        if (flag === 'INTERNACIONAL') {
+            divSub.style.display = '';
+            divPais.style.display = '';
+        } else {
+            divSub.style.display = 'none';
+            divPais.style.display = 'none';
+        }
+    }
+    document.addEventListener('DOMContentLoaded', toggleSubdivisao);
+
+    // --- FUNÇÕES PARA CAMPOS DINÂMICOS ---
+
+    function criarBotaoRemover() {
+        return '<button type="button" class="btn btn-outline-danger btn-sm" onclick="this.parentElement.parentElement.remove()"><i class="bi bi-trash"></i></button>';
+    }
+
+    function adicionarAutor() {
+        const container = document.getElementById('container-autores');
+        const div = document.createElement('div');
+        div.className = 'row g-2 mb-2 border-bottom pb-2';
+        div.innerHTML = `
+            <div class="col-md-3">
+                <label class="form-label small">Nome Completo</label>
+                <input type="text" class="form-control form-control-sm" name="autores_nome[]" required placeholder="Nome do Autor">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">CPF</label>
+                <input type="text" class="form-control form-control-sm" name="autores_cpf[]" placeholder="CPF (somente números)">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Função</label>
+                <select class="form-select form-select-sm" name="autores_funcao[]">
+                    <option value="AUTOR">Autor</option>
+                    <option value="COMPOSITOR">Compositor</option>
+                    <option value="VERSIONISTA">Versionista</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small">%</label>
+                <input type="text" class="form-control form-control-sm" name="autores_percentual[]" placeholder="100">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">CAE/IPI</label>
+                <input type="text" class="form-control form-control-sm" name="autores_cae[]">
+            </div>
+             <div class="col-md-1">
+                <label class="form-label small"></label>
+                ${criarBotaoRemover()}
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function adicionarInterprete() {
+        const container = document.getElementById('container-interpretes');
+        const div = document.createElement('div');
+        div.className = 'row g-2 mb-2 border-bottom pb-2';
+        div.innerHTML = `
+            <div class="col-md-3">
+                <label class="form-label small">Nome Artístico/Civil</label>
+                <input type="text" class="form-control form-control-sm" name="interpretes_nome[]" required placeholder="Nome do Intérprete">
+            </div>
+             <div class="col-md-2">
+                <label class="form-label small">CPF/CNPJ</label>
+                <input type="text" class="form-control form-control-sm" name="interpretes_doc[]">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Categoria</label>
+                <select class="form-select form-select-sm" name="interpretes_categoria[]">
+                    <option value="INTERPRETE">Intérprete</option>
+                    <option value="MUSICO">Músico</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small">%</label>
+                <input type="text" class="form-control form-control-sm" name="interpretes_percentual[]" placeholder="100">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Associação</label>
+                <select class="form-select form-select-sm" name="interpretes_assoc[]">
+                    <option value="">Selecione...</option>
+                    <option value="ABRAMUS">ABRAMUS</option>
+                    <option value="UBC">UBC</option>
+                    <option value="AMAR">AMAR</option>
+                    <option value="SBACEM">SBACEM</option>
+                    <option value="SICAM">SICAM</option>
+                    <option value="SOCINPRO">SOCINPRO</option>
+                </select>
+            </div>
+             <div class="col-md-1">
+                <label class="form-label small"></label>
+                ${criarBotaoRemover()}
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function adicionarMusico() {
+        const container = document.getElementById('container-musicos');
+        const div = document.createElement('div');
+        div.className = 'row g-2 mb-2 border-bottom pb-2';
+        div.innerHTML = `
+            <div class="col-md-3">
+                <label class="form-label small">Nome</label>
+                <input type="text" class="form-control form-control-sm" name="musicos_nome[]" required placeholder="Nome do Músico">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">CPF</label>
+                <input type="text" class="form-control form-control-sm" name="musicos_cpf[]">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Instrumento</label>
+                <input type="text" class="form-control form-control-sm" name="musicos_instrumento[]" placeholder="Ex: Baixo">
+            </div>
+             <div class="col-md-2">
+                <label class="form-label small">Tipo</label>
+                <select class="form-select form-select-sm" name="musicos_tipo[]">
+                    <option value="ACOMPANHANTE">Acompanhante</option>
+                    <option value="SOLISTA">Solista</option>
+                    <option value="ARRANJADOR">Arranjador</option>
+                </select>
+            </div>
+             <div class="col-md-1">
+                <label class="form-label small"></label>
+                ${criarBotaoRemover()}
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function toggleSubdivisao() {
+        var elFlag = document.getElementById('flag_nacional');
+        if (!elFlag) return;
+        var flag = elFlag.value;
+        var divSub = document.getElementById('div_subdivisao');
+        var divPais = document.getElementById('div_pais_origem');
+
+        if (divSub && divPais) {
+            if (flag === 'INTERNACIONAL') {
+                divSub.style.display = '';
+                divPais.style.display = '';
+            } else {
+                divSub.style.display = 'none';
+                divPais.style.display = 'none';
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleSubdivisao();
+
+        // Inicializar abas explicitamente
+        var triggerTabList = [].slice.call(document.querySelectorAll('#participantesTab button'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        })
+        // Opcional: Adicionar 1 linha vazia de autor e intérprete por padrão
+        if (document.getElementById('container-autores') && document.getElementById('container-autores').children.length === 0) adicionarAutor();
+        if (document.getElementById('container-interpretes') && document.getElementById('container-interpretes').children.length === 0) adicionarInterprete();
+    });</script>
 {% endblock %}

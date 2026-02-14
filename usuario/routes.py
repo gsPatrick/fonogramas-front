@@ -77,7 +77,7 @@ def listar_fonogramas():
 def novo_fonograma():
     """Criar novo fonograma manualmente"""
     if request.method == 'POST':
-        dados = request.form.to_dict()
+        dados = fonograma_service.processar_dados_formulario(request.form)
         resultado = fonograma_service.criar_fonograma(dados, current_user)
         
         if resultado['sucesso']:
@@ -120,7 +120,7 @@ def editar_fonograma(fonograma_id):
         return redirect(url_for('usuario.detalhes_fonograma', fonograma_id=fonograma_id))
     
     if request.method == 'POST':
-        dados = request.form.to_dict()
+        dados = fonograma_service.processar_dados_formulario(request.form)
         resultado = fonograma_service.atualizar_fonograma(fonograma, dados, current_user)
         
         if resultado['sucesso']:
