@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sincronizando Acesso - SBACEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes progress {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            50% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse-custom {
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        .animate-progress {
+            animation: progress 3s ease-in-out infinite;
+        }
+
+        .animate-spin-custom {
+            animation: spin 10s linear infinite;
+        }
+
+        .animate-pulse-custom {
+            animation: pulse-custom 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-[#0f172a] text-white overflow-hidden">
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center">
+        <!-- Background Grid Pattern -->
+        <div class="absolute inset-0 opacity-20"
+            style="background-image: radial-gradient(#475569 1px, transparent 1px); background-size: 30px 30px;">
+        </div>
+
+        {/* Radial Glow */}
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#152341]/30 to-[#0f172a]"></div>
+
+        <div class="relative flex flex-col items-center">
+            <div class="relative w-64 h-64 flex items-center justify-center mb-12">
+                <!-- Concentric Rings (Animated) -->
+                <div
+                    class="absolute border border-[#c11e3c]/30 border-dashed rounded-full w-48 h-48 animate-spin-custom">
+                </div>
+                <div class="absolute border border-slate-700/50 rounded-full w-64 h-64 animate-pulse-custom"></div>
+
+                <!-- Central Shield -->
+                <div
+                    class="relative z-10 flex items-center justify-center w-24 h-24 bg-[#152341] rounded-3xl border-2 border-[#c11e3c]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="#c11e3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="animate-pulse">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <h2 class="text-2xl font-black uppercase tracking-[0.4em] text-white drop-shadow-2xl mb-4">
+                    Sincronizando Acesso
+                </h2>
+                <div class="flex items-center justify-center gap-3">
+                    <div class="h-[1px] w-12 bg-gradient-to-r from-transparent to-slate-700"></div>
+                    <span class="text-[10px] font-bold text-slate-500 tracking-[0.2em] uppercase">Protocolo Seguro
+                        v2.5</span>
+                    <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-slate-700"></div>
+                </div>
+            </div>
+
+            <!-- Progress bar simulation -->
+            <div class="w-64 h-1.5 bg-slate-800/50 rounded-full mt-12 overflow-hidden border border-slate-700/30">
+                <div class="h-full bg-gradient-to-r from-[#c11e3c] to-[#f43f5e] animate-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TICKET = "{{ ticket }}";
+
+        async function startHandshake() {
+            try {
+                // Pequeno delay para a animação ser percebida
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                const response = await fetch("{{ url_for('auth.validate_ticket') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ticket: TICKET })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = "{{ url_for('index') }}";
+                } else {
+                    console.error("Erro na validação:", data.error);
+                    window.location.href = "{{ url_for('auth.login') }}";
+                }
+            } catch (err) {
+                console.error("Falha no handshake:", err);
+                window.location.href = "{{ url_for('auth.login', error='sso_failed') }}";
+            }
+        }
+
+        window.onload = startHandshake;
+    </script>
+</body>
+
+</html>

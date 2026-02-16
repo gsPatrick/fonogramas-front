@@ -85,6 +85,72 @@ def logout():
     logout_user()
     return redirect(url_for('auth.login'))
 
+@auth_bp.route('/liberar')
+def liberar():
+    """Handshake SSO do Hub Central"""
+    ticket = request.args.get('ticket')
+    if not ticket:
+        return redirect(url_for('auth.login'))
+    
+    # Renderizar página de loading premium
+    return render_template('auth/liberar.html', ticket=ticket)
+
+@auth_bp.route('/validate-ticket', methods=['POST'])
+def validate_ticket():
+    """Valida o ticket recebido do Hub e inicia sessão local"""
+    import requests
+    import os
+    
+    data = request.get_json()
+    ticket = data.get('ticket')
+    hub_url = os.environ.get('HUB_URL', 'https://api.sbacem.com.br/apicentralizadora')
+    system_id = 4 # Fonogramas
+    
+    try:
+        # 1. Validar ticket no Hub
+        hub_res = requests.post(
+            f"{hub_url}/auth/validate-ticket",
+            json={"ticket": ticket, "system_id": system_id},
+            timeout=10
+        )
+        
+        if hub_res.status_code != 200:
+            return jsonify({"success": False, "error": "Ticket inválido"}), 401
+            
+        hub_data = hub_res.json()
+        email = hub_data.get('email')
+        is_admin = hub_data.get('is_superadmin', False)
+        
+        # 2. Sincronizar usuário local
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            # Criar usuário se não existir (vindo do Hub)
+            user = User(
+                email=email,
+                nome=email.split('@')[0].capitalize(),
+                role='admin' if is_admin else 'usuario',
+                ativo=True
+            )
+            # Senha aleatória para usuários SSO
+            import secrets
+            user.set_password(secrets.token_hex(16))
+            db.session.add(user)
+        else:
+            # Atualizar role se mudou no Hub
+            user.role = 'admin' if is_admin else 'usuario'
+            user.ativo = True
+            
+        db.session.commit()
+        
+        # 3. Iniciar sessão
+        login_user(user, remember=True)
+        
+        return jsonify({"success": True})
+        
+    except Exception as e:
+        print(f"Erro no handshake SSO: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
 # ==================== RECUPERAÇÃO DE SENHA ====================
 
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
