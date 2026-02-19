@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from urllib.parse import urlparse
 from models import User, db
@@ -143,6 +143,7 @@ def validate_ticket():
         db.session.commit()
         
         # 3. Iniciar sessão
+        session['sso_verified'] = True
         login_user(user, remember=True)
         
         return jsonify({"success": True})
