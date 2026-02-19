@@ -88,12 +88,12 @@ def logout():
 @auth_bp.route('/liberar')
 def liberar():
     """Handshake SSO do Hub Central"""
-    ticket = request.args.get('ticket')
-    if not ticket:
+    token = request.args.get('token')
+    if not token:
         return redirect(url_for('auth.login'))
     
     # Renderizar página de loading premium
-    return render_template('auth/liberar.html', ticket=ticket)
+    return render_template('auth/liberar.html', ticket=token)
 
 @auth_bp.route('/validate-ticket', methods=['POST'])
 def validate_ticket():
@@ -110,7 +110,7 @@ def validate_ticket():
         # 1. Validar ticket no Hub
         hub_res = requests.post(
             f"{hub_url}/auth/validate-ticket",
-            json={"ticket": ticket, "system_id": system_id},
+            json={"token": ticket, "system_id": system_id},
             timeout=10
         )
         
