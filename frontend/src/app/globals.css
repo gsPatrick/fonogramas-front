@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --primary-navy: #111e35;
+  --secondary-navy: #1b2d4f;
+  --accent-red: #c41e3b;
+  --white: #FFFFFF;
+  --bg-soft: #F8F9FB;
+  --text-primary: #111e35;
+  --text-secondary: rgba(17, 30, 53, 0.65);
+  --border-color: rgba(17, 30, 53, 0.1);
+  --transition-speed: 0.4s;
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 10px 40px rgba(20, 34, 60, 0.08);
+
+  /* Gradients Unificadores */
+  --navy-gradient: linear-gradient(135deg, #111d35 0%, #1a2b4f 100%);
+  --navy-gradient-soft: linear-gradient(135deg, #1a2b4f 0%, #2c3e50 100%);
+}
+
+@theme inline {
+  --color-navy-primary: var(--primary-navy);
+  --color-navy-secondary: var(--secondary-navy);
+  --color-accent-red: var(--accent-red);
+  --color-bg-soft: var(--bg-soft);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--bg-soft);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.layout-root {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}

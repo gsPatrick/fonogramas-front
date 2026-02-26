@@ -118,13 +118,16 @@ def validate_ticket():
             return jsonify({"success": False, "error": "Ticket inválido"}), 401
             
         hub_data = hub_res.json()
+        print(f"DEBUG: Hub data received: {hub_data}")
         email = hub_data.get('email')
-        is_admin = hub_data.get('is_superadmin', False)
+        # Aceitar tanto is_superadmin quanto is_admin do Hub
+        is_admin = hub_data.get('is_superadmin') or hub_data.get('is_admin') or False
         
         # 2. Sincronizar usuário local
         user = User.query.filter_by(email=email).first()
         if not user:
             # Criar usuário se não existir (vindo do Hub)
+            print(f"DEBUG: Creating local user for {email} with role admin={is_admin}")
             user = User(
                 email=email,
                 nome=email.split('@')[0].capitalize(),
@@ -137,6 +140,7 @@ def validate_ticket():
             db.session.add(user)
         else:
             # Atualizar role se mudou no Hub
+            print(f"DEBUG: Updating local user {email} role to admin={is_admin}")
             user.role = 'admin' if is_admin else 'usuario'
             user.ativo = True
             
@@ -146,7 +150,36 @@ def validate_ticket():
         session['sso_verified'] = True
         login_user(user, remember=True)
         
-        return jsonify({"success": True})
+        # 4. Preparar resposta com o cookie específico que o frontend Next.js espera
+        # O Hub retorna um 'access_token' que é um JWT contendo as permissões
+        hub_jwt = hub_data.get('access_token')
+        
+        response = jsonify({
+            "success": True,
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "nome": user.nome,
+                "is_admin": user.is_admin,
+                "is_superadmin": user.is_admin # Frontend espera is_superadmin
+            }
+        })
+        
+        # O cookie satellite_session deve conter o JWT do Hub com prefixo 'token:'
+        # formato: token:<JWT>
+        session_value = f"token:{hub_jwt}" if hub_jwt else f"user:{user.email}"
+        
+        response.set_cookie(
+            'satellite_session',
+            session_value,
+            httponly=True,
+            secure=os.environ.get('FLASK_ENV') == 'production',
+            samesite='Lax',
+            max_age=3600*24, # 24 horas
+            path='/' 
+        )
+        
+        return response
         
     except Exception as e:
         print(f"Erro no handshake SSO: {str(e)}")

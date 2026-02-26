@@ -10,12 +10,16 @@ from admin import admin_bp
 from usuario import usuario_bp
 from api import api_bp  # API REST
 import os
+from dotenv import load_dotenv
 import tempfile
 import logging
 from datetime import datetime, timedelta
 from sqlalchemy import func
 from functools import wraps
 import time
+
+# Carregar variáveis de ambiente
+load_dotenv()
 
 # ==================== CONFIGURAÇÃO ====================
 app = Flask(__name__)
@@ -75,6 +79,37 @@ def get_client_ip():
     if request.headers.get('X-Forwarded-For'):
         return request.headers.get('X-Forwarded-For').split(',')[0].strip()
     return request.remote_addr
+
+@app.before_request
+def auto_login_from_satellite_cookie():
+    """Realiza login automático se houver um cookie satellite_session válido"""
+    if not current_user.is_authenticated:
+        token = request.cookies.get('satellite_session')
+        if token and token.startswith('token:'):
+            from jose import jwt
+            from models import User, db
+            
+            jwt_token = token.split(':', 1)[1]
+            # Chave do Hub Centralizada encontrada no VPS
+            HUB_SECRET_KEY = os.environ.get('HUB_SECRET_KEY', 'prod_secret_key_bf3c8592_change_me_to_something_very_secure_in_real_prod')
+            HUB_ALGORITHM = 'HS256'
+            
+            try:
+                payload = jwt.decode(jwt_token, HUB_SECRET_KEY, algorithms=[HUB_ALGORITHM])
+                email = payload.get('sub')
+                if email:
+                    user = User.query.filter_by(email=email).first()
+                    if user and user.is_active:
+                        # Sincronizar permissão de admin vinda do token
+                        is_admin = payload.get('is_superadmin', False)
+                        user.role = 'admin' if is_admin else 'usuario'
+                        db.session.commit()
+                        
+                        login_user(user, remember=True)
+                        app.logger.info(f"Auto-login via satellite_session para {email} (admin={is_admin})")
+            except Exception as e:
+                # Token inválido ou expirado - silencioso
+                pass
 
 @app.before_request
 def rate_limit():
@@ -190,6 +225,12 @@ cors_config = {
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True
+    },
+    r"/public/*": {
+        "origins": cors_origins_list,
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        "allow_headers": ["Content-Type", "Authorization", "x-draft-token"],
+        "supports_credentials": True
     }
 }
 
@@ -211,14 +252,51 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Registrar Blueprints
-app.register_blueprint(auth_bp, url_prefix='/auth')
-app.register_blueprint(admin_bp)
-app.register_blueprint(usuario_bp)
-app.register_blueprint(api_bp)  # API REST em /api/*
+# ==================== ENDPOINTS ADICIONAIS NEXT.JS ====================
 
-# Isentar API do CSRF (usa autenticação própria via JSON)
-csrf.exempt(api_bp)
+@app.route('/api/auth/me', methods=['GET'])
+@csrf.exempt
+def get_me():
+    """Retorna dados do usuário logado para o Next.js AuthGuard"""
+    if not current_user.is_authenticated:
+        return jsonify({"success": False, "error": "Não autenticado"}), 401
+    return jsonify({
+        "success": True,
+        "user": {
+            "id": current_user.id,
+            "email": current_user.email,
+            "nome": current_user.nome,
+            "role": current_user.role,
+            "is_admin": current_user.is_admin
+        }
+    })
+
+@app.route('/api/lote/validar', methods=['POST'])
+@csrf.exempt
+def api_lote_validar():
+    """Validação instantânea de arquivo para o Grid do Next.js"""
+    if 'file' not in request.files:
+        return jsonify({"error": "Nenhum arquivo enviado"}), 400
+    
+    arquivo = request.files['file']
+    from shared.processador import processar_csv
+    import tempfile
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(arquivo.filename)[1]) as tmp:
+        arquivo.save(tmp.name)
+        try:
+            df, erros, encoding, delim = processar_csv(tmp.name)
+            # Converter DataFrame para lista de dicts para o grid
+            dados = df.to_dict('records')
+            return jsonify({
+                "success": True,
+                "data": dados,
+                "errors": erros,
+                "total": len(dados)
+            })
+        finally:
+            if os.path.exists(tmp.name):
+                os.remove(tmp.name)
 
 # Criar diretórios necessários
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)

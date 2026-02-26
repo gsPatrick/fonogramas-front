@@ -467,3 +467,27 @@ class HistoricoFonograma(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
 
+
+class EcadLog(db.Model):
+    """Log de geração de arquivos ECAD"""
+    __tablename__ = 'ecad_logs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    file_name = db.Column(db.String(255), nullable=False)
+    layout = db.Column(db.String(50), nullable=False)  # 0660, 0661, etc.
+    entity_count = db.Column(db.Integer, default=0)
+    status = db.Column(db.String(50), default='COMPLETED')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'file_name': self.file_name,
+            'layout': self.layout,
+            'entity_count': self.entity_count,
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
+
+
+

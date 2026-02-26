@@ -235,3 +235,55 @@ def serialize_fonograma(f, resumido=False):
         ]
     }
 
+def gerar_pdf_proposta(proposta, output_path):
+    """
+    Gera um PDF da proposta de filiação.
+    """
+    from fpdf import FPDF
+    
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    
+    # Cabeçalho
+    pdf.cell(190, 10, "SBACEM - PROPOSTA DE FILIAÇÃO", ln=True, align="C")
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(190, 10, f"Protocolo: {proposta.protocolo}", ln=True, align="C")
+    pdf.ln(10)
+    
+    # Dados Pessoais
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(190, 8, "Dados Pessoais", ln=True, fill=False)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(190, 6, f"Nome Completo: {proposta.nome_completo}", ln=True)
+    pdf.cell(190, 6, f"CPF: {proposta.cpf}", ln=True)
+    pdf.cell(190, 6, f"E-mail: {proposta.email}", ln=True)
+    pdf.cell(190, 6, f"Celular: {proposta.celular}", ln=True)
+    pdf.cell(190, 6, f"Data de Nascimento: {proposta.data_nascimento}", ln=True)
+    pdf.ln(5)
+    
+    # Endereço
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(190, 8, "Endereço", ln=True)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(190, 6, f"Logradouro: {proposta.rua}, {proposta.numero}", ln=True)
+    pdf.cell(190, 6, f"Bairro: {proposta.bairro}", ln=True)
+    pdf.cell(190, 6, f"Cidade/UF: {proposta.cidade}/{proposta.uf}", ln=True)
+    pdf.cell(190, 6, f"CEP: {proposta.cep}", ln=True)
+    pdf.ln(5)
+    
+    # Dados Bancários
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(190, 8, "Dados Bancários", ln=True)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(190, 6, f"Banco: {proposta.banco}", ln=True)
+    pdf.cell(190, 6, f"Agência: {proposta.agencia} | Conta: {proposta.conta} ({proposta.tipo_conta})", ln=True)
+    pdf.ln(10)
+    
+    # Rodapé / Espaço para assinatura (opcional, já que é digital)
+    pdf.set_font("Arial", "I", 8)
+    pdf.cell(190, 10, "Este documento foi gerado eletronicamente e passará por assinatura digital via Clicksign.", ln=True, align="C")
+    
+    pdf.output(output_path)
+    return output_path
+

@@ -15,45 +15,108 @@
 </head>
 
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <div class="header-content">
-                <div class="logo-container">
-                    <img src="{{ url_for('static', filename='logo_sbacem.png') }}" alt="SBACEM"
-                        style="height: 120px; width: auto; object-fit: contain;">
+    <div class="layout-wrapper" style="display: flex; min-height: 100vh; background-color: #f8f9fb; overflow: hidden;">
+
+        <!-- Sidebar Modernizada -->
+        <aside class="sidebar-modern"
+            style="width: 260px; background-color: var(--cor-primaria); color: white; display: flex; flex-direction: column; flex-shrink: 0; position: fixed; height: 100vh; z-index: 1000;">
+            <div class="sidebar-header"
+                style="padding: 25px 20px; font-weight: 800; font-size: 1.3rem; border-bottom: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
+                FONOGRAMAS <span style="color: var(--cor-secundaria); font-style: italic;">CORE</span>
+            </div>
+            <nav class="sidebar-nav"
+                style="flex: 1; padding: 20px 0; overflow-y: auto; display: flex; flex-direction: column; gap: 5px;">
+                <a href="{{ url_for('usuario.dashboard') }}" class="nav-link-modern"
+                    style="color: rgba(255,255,255,0.7); padding: 12px 25px; display: flex; align-items: center; text-decoration: none; font-weight: 500; transition: all 0.3s; margin: 0 10px; border-radius: 8px;">
+                    <i class="bi bi-grid text-lg me-3"></i> Dashboard
+                </a>
+                <a href="{{ url_for('usuario.listar_fonogramas') }}" class="nav-link-modern"
+                    style="color: rgba(255,255,255,0.7); padding: 12px 25px; display: flex; align-items: center; text-decoration: none; font-weight: 500; transition: all 0.3s; margin: 0 10px; border-radius: 8px;">
+                    <i class="bi bi-music-note-list text-lg me-3"></i> Fonogramas
+                </a>
+                <a href="{{ url_for('usuario.ecad') }}" class="nav-link-modern"
+                    style="color: rgba(255,255,255,0.7); padding: 12px 25px; display: flex; align-items: center; text-decoration: none; font-weight: 500; transition: all 0.3s; margin: 0 10px; border-radius: 8px;">
+                    <i class="bi bi-cloud-arrow-up text-lg me-3"></i> Módulo de Lote
+                </a>
+                <a href="{{ url_for('admin.dashboard') }}" class="nav-link-modern"
+                    style="color: rgba(255,255,255,0.7); padding: 12px 25px; display: flex; align-items: center; text-decoration: none; font-weight: 500; transition: all 0.3s; margin: 0 10px; border-radius: 8px;">
+                    <i class="bi bi-gear text-lg me-3"></i> Admnistração
+                </a>
+            </nav>
+            <div class="sidebar-footer"
+                style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 35px; height: 35px; border-radius: 50%; background-color: var(--cor-secundaria); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
+                    U
+                </div>
+                <div style="font-size: 0.85rem;">
+                    <p
+                        style="margin: 0; color: rgba(255,255,255,0.5); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px;">
+                        Sessão</p>
+                    <p style="margin: 0; font-weight: 600;">Ativa</p>
                 </div>
             </div>
-        </header>
+        </aside>
 
-        <!-- Navegação removida: Acesso apenas via Login -->
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper"
+            style="flex: 1; display: flex; flex-direction: column; margin-left: 260px; height: 100vh; overflow-y: auto;">
 
-        <!-- Conteúdo Principal -->
-        <main>
-            {% block flash_messages %}
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}"
-                style="padding: 15px; margin-bottom: 20px; border-radius: 8px; background: {% if category == 'success' %}#d4edda{% elif category == 'danger' %}#f8d7da{% elif category == 'warning' %}#fff3cd{% else %}#cce5ff{% endif %}; border-left: 4px solid {% if category == 'success' %}#28a745{% elif category == 'danger' %}#dc3545{% elif category == 'warning' %}#ffc107{% else %}#007bff{% endif %};">
-                {{ message }}
-            </div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-            {% endblock %}
+            <!-- Navbar Modernizada -->
+            <nav class="top-navbar"
+                style="height: 70px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; position: sticky; top: 0; z-index: 500;">
+                <div style="display: flex; align-items: center;">
+                    <span style="color: #64748b; font-size: 0.9rem; font-weight: 500;">SBACEM <span
+                            class="mx-2">/</span> <span style="color: var(--cor-primaria);">{% block header_title
+                            %}Dashboard{% endblock %}</span></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <button
+                        style="background: none; border: none; color: #64748b; cursor: pointer; position: relative;">
+                        <i class="bi bi-bell" style="font-size: 1.2rem;"></i>
+                        <span
+                            style="position: absolute; top: -5px; right: -5px; background: var(--cor-secundaria); width: 15px; height: 15px; border-radius: 50%; font-size: 9px; color: white; display: flex; align-items: center; justify-content: center;">3</span>
+                    </button>
+                    <div style="height: 25px; width: 1px; background: #e2e8f0;"></div>
+                    <a href="{{ url_for('auth.logout') }}"
+                        style="color: #64748b; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: color 0.3s;">
+                        Sair <i class="bi bi-box-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </nav>
 
-            {% block content %}{% endblock %}
-        </main>
+            <!-- Conteúdo da Página -->
+            <main class="page-content" style="padding: 30px; flex: 1;">
 
-        <!-- Footer -->
-        <footer>
-            <div class="footer-content">
-                <p class="footer-title">Sistema de Processamento de Fonogramas</p>
-                <p class="footer-org">SBACEM - Sociedade Brasileira de Autores, Compositores e Escritores de Música</p>
-                <p class="footer-version">Versão 2.0</p>
-            </div>
-        </footer>
+                <!-- Flash Messages -->
+                {% block flash_messages %}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages-container" style="margin-bottom: 25px;">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}"
+                        style="padding: 15px 20px; border-radius: 8px; background: {% if category == 'success' %}#f0fdf4{% elif category == 'danger' %}#fef2f2{% elif category == 'warning' %}#fffbeb{% else %}#eff6ff{% endif %}; border-left: 4px solid {% if category == 'success' %}#22c55e{% elif category == 'danger' %}#ef4444{% elif category == 'warning' %}#f59e0b{% else %}#3b82f6{% endif %}; color: #0f172a; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px;">
+                        {% if category == 'success' %}<i class="bi bi-check-circle-fill text-success"></i>{% elif
+                        category == 'danger' %}<i class="bi bi-exclamation-triangle-fill text-danger"></i>{% endif %}
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+                {% endblock %}
+
+                <!-- Content Container Moderno -->
+                <div class="container-modern"
+                    style="background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05); padding: 30px; width: 100%; max-width: 1300px; margin: 0 auto;">
+                    {% block content %}{% endblock %}
+                </div>
+
+                <footer style="margin-top: 40px; text-align: center; color: #94a3b8; font-size: 0.85rem;">
+                    <p style="margin: 0;">&copy; 2024 SBACEM - Sistema de Processamento de Fonogramas Core v2.0</p>
+                </footer>
+            </main>
+        </div>
     </div>
 
     <!-- Bootstrap JS Bundle -->

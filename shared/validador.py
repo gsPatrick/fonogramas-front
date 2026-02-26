@@ -307,3 +307,27 @@ def validar_data(data: str) -> bool:
     
     return False
 
+def aplicar_regra_varsovia(pais_origem: str, pais_executor: str = 'BRASIL') -> bool:
+    """
+    Aplica a Regra de Varsóvia para reciprocidade de direitos autorais entre países.
+    Conforme manual do ECAD, verifica se o país de origem tem acordo de reciprocidade.
+    """
+    # Lista detalhada de países signatários e com reciprocidade (Varsóvia/Roma/Berna)
+    PAISES_RECIPROCIDADE = [
+        'BRASIL', 'ESTADOS UNIDOS', 'REINO UNIDO', 'FRANÇA', 'ALEMANHA', 
+        'ITÁLIA', 'ESPANHA', 'PORTUGAL', 'ARGENTINA', 'URUGUAI', 'CHILE', 
+        'MÉXICO', 'CANADÁ', 'JAPÃO', 'COREIA DO SUL', 'AUSTRÁLIA', 'ÁUSTRIA',
+        'BÉLGICA', 'SUIÇA', 'HOLANDA', 'SUÉCIA', 'NORUEGA', 'DINAMARCA'
+    ]
+    
+    origem = str(pais_origem or '').upper().strip()
+    if not origem or origem == 'BRASIL':
+        return True
+        
+    return origem in PAISES_RECIPROCIDADE
+
+def validar_repertorio_internacional(fono) -> bool:
+    """Valida conformidade internacional baseada na reciprocidade."""
+    if (fono.flag_nacional or '').upper() == 'INTERNACIONAL':
+        return aplicar_regra_varsovia(fono.pais_origem)
+    return True

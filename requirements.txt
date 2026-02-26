@@ -10,3 +10,9 @@ flask-cors>=4.0.0
 flasgger>=0.9.7
 requests>=2.31.0
 xlrd>=2.0.1
+gunicorn
+uvicorn
+psycopg2-binary
+python-dotenv
+pydantic-settings
+fpdf2

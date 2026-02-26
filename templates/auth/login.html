@@ -7,220 +7,230 @@
     <title>Login - SBACEM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --cor-primaria: #111e35;
+            --cor-secundaria: #c41e3b;
         }
 
         body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fb;
+            color: #1e293b;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .outfit-font {
             font-family: 'Outfit', sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #22164C 0%, #3D2E6B 50%, #EF234D 100%);
+        }
+
+        .auth-wrapper {
             display: flex;
-            align-items: center;
+            min-height: 100vh;
+        }
+
+        .auth-presentation {
+            background-color: var(--cor-primaria);
+            background-image: linear-gradient(135deg, var(--cor-primaria) 0%, #1e293b 100%);
+            display: flex;
+            flex-direction: column;
             justify-content: center;
-            padding: 2rem;
-        }
-
-        .login-container {
-            width: 100%;
-            max-width: 420px;
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            align-items: center;
+            color: white;
+            padding: 3rem;
+            position: relative;
             overflow: hidden;
         }
 
-        .login-header {
-            background: linear-gradient(135deg, #22164C 0%, #3D2E6B 50%, #EF234D 100%);
-            color: white;
-            text-align: center;
-            padding: 2.5rem 2rem;
+        /* Efeito de overlay criativo na apresentação */
+        .auth-presentation::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at bottom right, rgba(196, 30, 59, 0.2) 0%, transparent 60%);
+            pointer-events: none;
         }
 
-        .login-header img {
-            height: 70px;
-            margin-bottom: 1rem;
+        .auth-form-container {
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+            z-index: 10;
         }
 
-        .login-header h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+        .auth-form-inner {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
-        .login-header .subtitle {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-top: 0.5rem;
+        .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
-        .login-body {
-            padding: 2.5rem;
+        .form-control:focus {
+            border-color: var(--cor-primaria);
+            box-shadow: 0 0 0 4px rgba(17, 30, 53, 0.1);
         }
 
         .form-label {
             font-weight: 500;
-            color: #22164C;
+            color: #64748b;
+            font-size: 0.9rem;
             margin-bottom: 0.5rem;
         }
 
-        .form-control {
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 0.875rem 1rem;
-            font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        .form-control:focus {
-            border-color: #3D2E6B;
-            box-shadow: 0 0 0 3px rgba(61, 46, 107, 0.15);
-        }
-
-        .form-control::placeholder {
-            color: #aaa;
-        }
-
-        .btn-login {
-            background: linear-gradient(135deg, #22164C 0%, #3D2E6B 50%, #EF234D 100%);
-            border: none;
+        .btn-auth {
+            background-color: var(--cor-primaria);
             color: white;
-            padding: 1rem;
-            font-size: 1.1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
             font-weight: 600;
-            border-radius: 12px;
+            border: none;
             width: 100%;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
         }
 
-        .btn-login:hover {
+        .btn-auth:hover {
+            background-color: #0d172a;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(34, 22, 76, 0.4);
+            box-shadow: 0 6px 15px rgba(17, 30, 53, 0.2);
             color: white;
         }
 
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .footer-link {
-            color: #22164C;
+        .auth-link {
+            color: var(--cor-secundaria);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.9rem;
             transition: color 0.3s;
         }
 
-        .footer-link:hover {
-            color: #EF234D;
+        .auth-link:hover {
+            color: #a01830;
+            text-decoration: underline;
         }
 
         .divider {
             display: flex;
             align-items: center;
+            text-align: center;
+            color: #94a3b8;
             margin: 1.5rem 0;
+            font-size: 0.9rem;
         }
 
         .divider::before,
         .divider::after {
             content: '';
             flex: 1;
-            height: 1px;
-            background: #e0e0e0;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .divider span {
-            padding: 0 1rem;
-            color: #999;
-            font-size: 0.85rem;
+        .divider::before {
+            margin-right: 1em;
         }
 
-        .register-btn {
-            display: block;
-            width: 100%;
-            padding: 0.875rem;
-            border: 2px solid #22164C;
-            border-radius: 12px;
+        .divider::after {
+            margin-left: 1em;
+        }
+
+        .btn-register-outline {
+            border: 2px solid #e2e8f0;
             background: transparent;
-            color: #22164C;
-            font-weight: 600;
-            font-size: 1rem;
-            text-align: center;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .register-btn:hover {
-            background: #22164C;
-            color: white;
-        }
-
-        .alert {
+            color: #475569;
+            padding: 0.8rem 1.5rem;
             border-radius: 10px;
-            border: none;
-            font-size: 0.9rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            font-family: 'Outfit', sans-serif;
         }
 
-        .alert-danger {
-            background: rgba(239, 35, 77, 0.1);
-            color: #c0392b;
+        .btn-register-outline:hover {
+            border-color: #cbd5e1;
+            background: #f8f9fb;
+            color: var(--cor-primaria);
         }
 
-        .alert-success {
-            background: rgba(40, 167, 69, 0.1);
-            color: #27ae60;
-        }
-
-        @media (max-width: 576px) {
-            body {
-                padding: 1rem;
-            }
-
-            .login-body {
-                padding: 1.5rem;
-            }
-
-            .footer-links {
+        @media (max-width: 768px) {
+            .auth-wrapper {
                 flex-direction: column;
-                text-align: center;
+            }
+
+            .auth-presentation {
+                padding: 3rem 2rem;
+                min-height: 250px;
+            }
+
+            .auth-form-container {
+                padding: 3rem 2rem;
+                flex: 1;
+                box-shadow: none;
+                border-top-left-radius: 25px;
+                border-top-right-radius: 25px;
+                margin-top: -25px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <img src="{{ url_for('static', filename='logo_sbacem.png') }}" alt="SBACEM">
-                <h2>Login</h2>
-                <p class="subtitle">Sistema de Fonogramas</p>
-            </div>
-            <div class="login-body">
+    <div class="auth-wrapper">
+        <!-- Left Pane: Apresentação -->
+        <div class="auth-presentation col-md-6 col-lg-7">
+            <!-- A imagem da logo pode perder visibilidade em fundo escuro, então deixei um filtro para ficar branca caso seja escura -->
+            <img src="{{ url_for('static', filename='logo_sbacem.png') }}" alt="SBACEM" class="mb-4"
+                style="height: 100px; filter: brightness(0) invert(1); z-index: 1;">
+            <h1 class="outfit-font fw-bold mb-2 text-center"
+                style="font-size: 2.5rem; letter-spacing: 1px; z-index: 1;"> FONOGRAMAS <span
+                    style="color: var(--cor-secundaria); font-style: italic;">CORE</span></h1>
+            <p class="text-center opacity-75 fs-5 z-index-1">Processamento, Gestão e Integração ECAD/TOTVS</p>
+        </div>
+
+        <!-- Right Pane: Formulário -->
+        <div class="auth-form-container col-md-6 col-lg-5">
+            <div class="auth-form-inner">
+                <div class="mb-5 text-center text-md-start">
+                    <h2 class="outfit-font fw-bold" style="color: var(--cor-primaria);">Bem-vindo de volta!</h2>
+                    <p class="text-muted">Faça login para acessar o sistema.</p>
+                </div>
+
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="mb-4">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert"
+                        style="border-radius: 10px; font-size: 0.95rem;">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
                 {% endif %}
                 {% endwith %}
 
@@ -228,40 +238,46 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="mb-3">
-                        <label class="form-label">
-                            <i class="bi bi-envelope me-1"></i>Email
-                        </label>
-                        <input type="email" class="form-control" name="email" required autofocus
-                            placeholder="seu@email.com">
+                        <label class="form-label">E-mail Corporativo</label>
+                        <div class="input-group">
+                            <span class="input-group-text"
+                                style="background: white; border: 2px solid #e2e8f0; border-right: none; border-radius: 10px 0 0 10px; color: #94a3b8;"><i
+                                    class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" name="email" required autofocus
+                                placeholder="seu@email.com"
+                                style="border-left: none; border-radius: 0 10px 10px 0; padding-left: 0;">
+                        </div>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label">
-                            <i class="bi bi-lock me-1"></i>Senha
-                        </label>
-                        <input type="password" class="form-control" name="password" required
-                            placeholder="Digite sua senha">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label mb-0">Senha</label>
+                            <a href="{{ url_for('auth.forgot_password') }}" class="auth-link"
+                                style="font-size: 0.85rem;">Esqueceu a senha?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text"
+                                style="background: white; border: 2px solid #e2e8f0; border-right: none; border-radius: 10px 0 0 10px; color: #94a3b8;"><i
+                                    class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control" name="password" required
+                                placeholder="Digite sua senha"
+                                style="border-left: none; border-radius: 0 10px 10px 0; padding-left: 0;">
+                        </div>
                     </div>
 
-                    <div class="d-grid gap-2 mb-3">
-                        <button type="submit" class="btn-login">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+                    <div class="mb-4 mt-5">
+                        <button type="submit" class="btn-auth shadow-sm">
+                            Entrar no Sistema
                         </button>
                     </div>
 
-                    <div class="footer-links mb-3">
-                        <a href="{{ url_for('auth.forgot_password') }}" class="footer-link">
-                            <i class="bi bi-key me-1"></i>Esqueci minha senha
+                    <div class="divider">Acesso de Novos Usuários</div>
+
+                    <div>
+                        <a href="{{ url_for('auth.register') }}" class="btn-register-outline">
+                            Solicitar Conta
                         </a>
                     </div>
-
-                    <div class="divider">
-                        <span>ou</span>
-                    </div>
-
-                    <a href="{{ url_for('auth.register') }}" class="register-btn">
-                        <i class="bi bi-person-plus me-2"></i>Criar uma conta
-                    </a>
                 </form>
             </div>
         </div>

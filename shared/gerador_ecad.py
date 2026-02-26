@@ -849,13 +849,26 @@ def gerar_txt_ecad(fonogramas: List[Fonograma], output_path: str) -> Dict:
         lines.append('0669FON0')
         total_fonogramas += 1
 
-    # === FILE TRAILER (27 chars) ===
-    # 0660 + 226 (assoc) + 00020 (seq) + 00031 (total registros?) + ...
-    # Ajustando para usar contadores reais onde possível
-    # Ref: 0660 226 00020 00031 35000 00533
-    # Vamos manter estrutura aproximada
-    trailer = '0660' + '226' + _zpad(total_obras, 5) + _zpad(total_fonogramas, 5) + _zpad(len(lines)+1, 5) + _zpad(0, 8)
-    lines.append(trailer)
+    # === FILE HEADER REAL (Registro 000) ===
+    # Layout 0661: 000 + 0661 + SEQ(5) + DATA(8) + HORA(6) + NOME(30) + ...
+    data_hoje = datetime.now().strftime('%d%m%Y')
+    hora_hoje = datetime.now().strftime('%H%M%S')
+    header_000 = '000' + '0661' + '00001' + data_hoje + hora_hoje + _pad('SBACEM FONOGRAMAS', 30)
+    lines.insert(0, header_000)
+
+    total_obras = 0
+    total_fonogramas = 0
+    total_titulares = 0
+
+    # ... (Seção OBM e FON já populadas em lines) ...
+
+    # === FILE TRAILER REAL (Registro 999) ===
+    # 999 + TOTAL_LINHAS(9) + TOTAL_GRUPOS(9)
+    # +1 para a própria linha 999
+    total_linhas = len(lines) + 1
+    total_grupos = total_obras + total_fonogramas
+    trailer_999 = '999' + _zpad(total_linhas, 9) + _zpad(total_grupos, 9)
+    lines.append(trailer_999)
 
     # Ajustar extensão se necessário
     if output_path.lower().endswith('.exp'):
